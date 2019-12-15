@@ -1,10 +1,10 @@
 language: rust
 script:
-  - cargo build --verbose --all
-  - cargo test --verbose --all --  --nocapture
+- cargo build --verbose --all
+- cargo test --verbose --all --  --nocapture
 deploy:
   provider: cargo
   on:
     tags: true
-    token:
-      secure: Q9jw5eYIQxlguJgLmwdRLMzozj8JCdQ7welp/8/FoQwBMPd7IxBO4lcvObgw8n11/WoCb7wFQPT2leqxztK0prKhgdR4Usmvx7ybEom5ak2JHylCoPGK0FkN0cGlar1dmp0RkHsD+xiUvOVjZbpIer/0PcRd9QlYo6pIVgIXUGdKzNX1OiRGmNmg8MAAaas+3nf0aJt0IA/nP5Bn9m9mo1bCcTm2dIx8Z1IhAkIPMzWDpr5Mt4DTkONhFSzGvCG7y4PdkJ+BexwsjF1utKo5bDQ98zCPFdsv6F4A/bFZoFwXW14ajiOaSG++mSRoPwLS+5J8xErkFAnUt7LfvYi7jcVArgeH7WIfG66r2esrmpKWTFC1PkdYyEWpkombudj5cqstICC07pf44jwXH7ERqMMFNPKaf7K+RGHsILywKxC0c2/rp4ipVDKvBLTIUDaKkPVWqbGnGT5aq468LfgCp86ku8IEmiksVbe7hoM11F8LVSMuBeGALubcHrvTnxzdu9XKvJ0MTsqFUuuBTQXNq41nQ+4xUq0+yOlJA3odYrXumqqF70lDI22E0H5BF0gVP/6F3oMoGyZ6mK75aoXWgCd4/xwXTS7uNMU8uRJPrKwQpqQGefEr88N7OK+dhJPtl4e6CQ6HdLOyERjR1nA7hgxmzJt61RUBwafUK2XjgDI=
+  token:
+    secure: ADTU0amabulvQ6+TD5/TVqk3y/MqhnvFH2sFPpiPeaA7jZsspd+2ivaGpqZM4msiNpmLJKCp9Wl1PLiUWie09PTstMnfM6KcBen+wP1mWX8z/FZR35kmdFsD3EhYTPCC1t0GqKzhOUsXvQCJslr2wE5hmHlkOyp8FVw9/z0eZPZEpFp1LzQevkWo71UAXABIgk7vlPmoorXt72SfMbkjh3OAFzrwXzXMKSypndQkrIyAILhUEnIL3v8BjOZ4ofCJ4yCuWvMYFZKZwNPr2Xw5gsWbC+loOW5BC8+50iYSgTijPQEKi7L7jpsjIwyEq5dNAM7fIzHVzvlGszszrjEnfeZQ5JR4ND5zb/JOe54ltYQgUf4XTpcEjG7Kxqg1fpc/HTRRcXy5MIuk7yRfDF03x6sUVV865g6QOV6z/1kxcAPNtdN5Y3sEv1ClMD4NkHxgraToSCLBzUvC5/PfERXIhkVhduX+As0e8pwrEVSI6pnd8/EDc7+T2F6Do+fRyD52LNAErEXcYBM86kAuki/39GHcYpteo4l40RLLEZla82NISJLZS2wcEysFuOqmTh6kiztnociCDoqddgDOp70IHlYiZGlwR3hcvo8VjRpSMWGy/bTrquqCPnXsHt+iWIKbcs6uNnWkrX2Q+1aZqPCtizKuURxaXLQu/aVqLW/eaK4=
