@@ -88,6 +88,7 @@ mod test {
     use std::path::PathBuf;
     use std::fs::create_dir;
     use std::collections::HashMap;
+    use std::process::Command;
 
     #[test]
     fn test_file_hash() {
@@ -139,6 +140,11 @@ mod test {
         let unique = build_unique_file_tree(&temp_dir);
         let duplicates = build_duplicates_file_tree(&temp_dir);
         remove_duplicates(temp_dir.path().to_str().unwrap()).unwrap();
+
+        for d in vec!["dir_a", "dir_b", "dir_c", "dir_d"].iter(){
+            let output = Command::new("ls").arg(temp_dir.path().join(d).to_str().unwrap()).output().unwrap();
+            println!("{} {}", d, String::from_utf8(output.stdout).unwrap());
+        }
 
         for path in unique.iter() {
             let path = path.as_path();
