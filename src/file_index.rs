@@ -88,7 +88,7 @@ mod test {
     use std::path::PathBuf;
     use std::fs::create_dir;
     use std::collections::HashMap;
-    use std::process::Command;
+
 
     #[test]
     fn test_file_hash() {
@@ -141,10 +141,6 @@ mod test {
         let duplicates = build_duplicates_file_tree(&temp_dir);
         remove_duplicates(temp_dir.path().to_str().unwrap()).unwrap();
 
-        for d in vec!["dir_a", "dir_b", "dir_c", "dir_d"].iter(){
-            let output = Command::new("ls").arg(temp_dir.path().join(d).to_str().unwrap()).output().unwrap();
-            println!("{} {}", d, String::from_utf8(output.stdout).unwrap());
-        }
 
         for path in unique.iter() {
             let path = path.as_path();
@@ -153,9 +149,15 @@ mod test {
 
         assert!(temp_dir.path().exists());
         for (key, files) in duplicates.iter() {
-            let count = files.iter().fold(0, |_, x| {if x.exists() {1} else {0}});
+            let mut count = 0;
+            for file in files.iter() {
+                if file.exists() {
+                    count += 1;
+                }
+            }
+            //let count = files.iter().fold(0, |_, x| {if x.exists() {1} else {0}});
             println!("Current {} {}", key, count);
-            //assert_eq!(count, 1);
+            assert_eq!(count, 1);
         }
 
 
