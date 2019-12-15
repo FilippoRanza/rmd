@@ -87,6 +87,7 @@ mod test {
     use std::io::prelude::Write;
     use std::path::PathBuf;
     use std::fs::create_dir;
+    use std::collections::HashMap;
 
     #[test]
     fn test_file_hash() {
@@ -145,8 +146,9 @@ mod test {
         }
 
 
-        for files in duplicates.iter() {
+        for (key, files) in duplicates.iter() {
             let count = files.iter().fold(0, |_, x| {if x.exists() {1} else {0}});
+            println!("Current {}", key);
             assert_eq!(count, 1);
         }
 
@@ -181,8 +183,8 @@ mod test {
     }
 
 
-    fn build_duplicates_file_tree(dir: &TempDir) -> Vec<Vec<PathBuf>> {
-        let mut output = Vec::new();
+    fn build_duplicates_file_tree(dir: &TempDir) -> HashMap<String, Vec<PathBuf>> {
+        let mut output = HashMap::new();
 
         let duplicates = vec!["dup_a", "dup_b", "dup_c", "dup_d"];
         let mut tmp = Vec::new();
@@ -193,7 +195,7 @@ mod test {
             tmp.push(path);
         }
 
-        output.push(tmp);
+        output.insert(String::new(), tmp);
 
 
         let dirs = vec!["dir_a", "dir_b", "dir_c", "dir_d"];
@@ -207,7 +209,7 @@ mod test {
                 file.write("second".as_bytes()).unwrap();
                 tmp.push(path);
             }
-            output.push(tmp);
+            output.insert(String::from(*name), tmp);
         }
         
         output
