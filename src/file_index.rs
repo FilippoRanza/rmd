@@ -148,15 +148,13 @@ mod test {
         }
 
         assert!(temp_dir.path().exists());
-        for (key, files) in duplicates.iter() {
+        for (_, files) in duplicates.iter() {
             let mut count = 0;
             for file in files.iter() {
                 if file.exists() {
                     count += 1;
                 }
             }
-            //let count = files.iter().fold(0, |_, x| {if x.exists() {1} else {0}});
-            println!("Current {} {}", key, count);
             assert_eq!(count, 1);
         }
 
