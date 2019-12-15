@@ -145,7 +145,7 @@ mod test {
             assert!(path.exists());
         }
 
-
+        assert!(temp_dir.path().exists());
         for (key, files) in duplicates.iter() {
             let count = files.iter().fold(0, |_, x| {if x.exists() {1} else {0}});
             println!("Current {} {}", key, count);
