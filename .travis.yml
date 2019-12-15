@@ -2,3 +2,9 @@ language: rust
 script:
   - cargo build --verbose --all
   - cargo test --verbose --all --  --nocapture
+deploy:
+  provider: cargo
+  on:
+    tags: true
+    token:
+      secure: Q9jw5eYIQxlguJgLmwdRLMzozj8JCdQ7welp/8/FoQwBMPd7IxBO4lcvObgw8n11/WoCb7wFQPT2leqxztK0prKhgdR4Usmvx7ybEom5ak2JHylCoPGK0FkN0cGlar1dmp0RkHsD+xiUvOVjZbpIer/0PcRd9QlYo6pIVgIXUGdKzNX1OiRGmNmg8MAAaas+3nf0aJt0IA/nP5Bn9m9mo1bCcTm2dIx8Z1IhAkIPMzWDpr5Mt4DTkONhFSzGvCG7y4PdkJ+BexwsjF1utKo5bDQ98zCPFdsv6F4A/bFZoFwXW14ajiOaSG++mSRoPwLS+5J8xErkFAnUt7LfvYi7jcVArgeH7WIfG66r2esrmpKWTFC1PkdYyEWpkombudj5cqstICC07pf44jwXH7ERqMMFNPKaf7K+RGHsILywKxC0c2/rp4ipVDKvBLTIUDaKkPVWqbGnGT5aq468LfgCp86ku8IEmiksVbe7hoM11F8LVSMuBeGALubcHrvTnxzdu9XKvJ0MTsqFUuuBTQXNq41nQ+4xUq0+yOlJA3odYrXumqqF70lDI22E0H5BF0gVP/6F3oMoGyZ6mK75aoXWgCd4/xwXTS7uNMU8uRJPrKwQpqQGefEr88N7OK+dhJPtl4e6CQ6HdLOyERjR1nA7hgxmzJt61RUBwafUK2XjgDI=
