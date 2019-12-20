@@ -66,3 +66,59 @@ fn force_remove_duplicates(names: &Vec<&str>) -> Result<(), Error> {
     }
     Ok(())
 }
+
+#[cfg(test)]
+mod test {
+
+    use tempfile::TempDir;
+    use std::fs::{File, create_dir};
+    use super::*;
+
+
+    #[test]
+    fn test_force_remove() {
+        run_remove(Mode::Force);
+    }
+
+    #[test]
+    fn test_force_remove_dir() {
+        run_remove_dir(Mode::Force);
+    }
+
+    #[test]
+    #[should_panic(expected = "`Result::unwrap()` on an `Err` value: Os")]
+    fn test_std_remove() {
+        run_remove(Mode::Standard);
+    }
+
+    #[test]
+    #[should_panic(expected = "`Result::unwrap()` on an `Err` value: Os")]
+    fn test_std_remove_dir() {
+        run_remove_dir(Mode::Standard);
+    }
+
+    fn run_remove(mode: Mode) {
+        let dir = TempDir::new().unwrap();
+        let existing_file = dir.path().join("EXIST");
+        let _ = File::create(&existing_file).unwrap();
+        let not_existing_file = dir.path().join("NON_EXIST");
+        let files = vec![existing_file.to_str().unwrap(), not_existing_file.to_str().unwrap()];
+        remove(&files, false, mode).unwrap();
+    }
+
+    fn run_remove_dir(mode: Mode) {
+        let dir = TempDir::new().unwrap();
+        let existing_dir = dir.path().join("DIR_A");
+        create_dir(&existing_dir).unwrap();
+        for letter in ["a", "b", "c", "d"].iter() {
+            let tmp = existing_dir.join(letter);
+            File::create(tmp).unwrap();
+        }
+        
+        let non_existing_dir = dir.path().join("DIR_B");
+
+        let files = vec![existing_dir.to_str().unwrap(), non_existing_dir.to_str().unwrap()];
+        remove(&files, true, mode).unwrap();
+    }
+
+}
