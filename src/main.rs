@@ -53,7 +53,6 @@ fn run_remove<'a>(args: ArgMatches<'a>) -> Result<(), std::io::Error> {
     let force = args.is_present("force");
     let mode = get_mode(force, interactive);
     if args.is_present("files") {
-        println!("standard rm");
         let files: Vec<&str> = args.values_of("files").unwrap().collect();
         remove(&files, recursive, mode)?;
     }
