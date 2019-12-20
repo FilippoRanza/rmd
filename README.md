@@ -1,4 +1,7 @@
 # rmd
+
+[![Build Status](https://travis-ci.com/FilippoRanza/rmd.svg?branch=master)](https://travis-ci.com/FilippoRanza/rmd)
+
 An improved rm implementation able to remove duplicate files
 
 ## Description 
