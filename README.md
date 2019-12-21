@@ -12,6 +12,14 @@ it also able to remove duplicate file in given directories recursively.
 Duplicate file are found by comparing **SHA256** hashes. 
 When a file has an hash that has already been found it is removed immediately.
 
+## Installation
+
+This tool can be easly installed from sources:
+```bash
+cargo instal rmd
+```
+
+
 ## Usage 
 It works in an almost compatible way with the standard rm. To get a full help run:
 
