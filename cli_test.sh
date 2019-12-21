@@ -58,4 +58,21 @@ echo "Remove Directory"
 rmd -rf 'SOME'
 [[ -e "SOME" ]] && exit 1
 
+
+echo "Test Interactive"
+touch {a..z}
+yes | rmd -i {a..z}
+
+for i in {a..z} ; do
+    [[ -e "$i" ]] && exit 1
+done
+
+touch {a..z}
+yes n | rmd -i {a..z}
+
+for i in {a..z} ; do
+    [[ -e "$i" ]] || exit 1
+done
+
+
 echo "Done"

@@ -4,6 +4,7 @@ use std::fs::remove_dir_all;
 use std::fs::remove_file;
 
 use super::file_index;
+use super::io_engine;
 
 pub enum Mode {
     Interactive, 
@@ -15,7 +16,7 @@ pub enum Mode {
 pub fn remove(names: &Vec<&str>, recursive: bool, mode: Mode) -> Result<(), Error> {
     match mode {
         Mode::Force => force_remove_files(names, recursive),
-        Mode::Interactive => std_remove_files(names, recursive),
+        Mode::Interactive => interactive_remove_files(names, recursive),
         Mode::Standard => std_remove_files(names, recursive),
     }
 }
@@ -33,6 +34,16 @@ fn force_remove_files(names: &Vec<&str>, rec: bool) -> Result<(), Error> {
     }
     Ok(())
 }
+
+fn interactive_remove_files(names: &Vec<&str>, rec: bool) -> Result<(), Error> {
+    for name in names.iter() {
+        if io_engine::remove_question(name)? {
+            remove_wrap(name, rec)?;
+        }
+    }
+    Ok(())
+}
+
 
 fn remove_wrap(name: &str, rec: bool) -> Result<(), Error> {
     if rec {
