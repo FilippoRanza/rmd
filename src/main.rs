@@ -16,7 +16,7 @@ pub fn parse_args<'a>() -> ArgMatches<'a> {
     );
 
     let parser = parser.arg(
-        Arg::with_name("interactive").short("-i").long("--inter").help("prompt before every removal").conflicts_with("force")
+        Arg::with_name("interactive").short("-i").long("--inter").help("prompt before every removal(not implemented)").conflicts_with("force")
     );
 
     let parser = parser.arg(

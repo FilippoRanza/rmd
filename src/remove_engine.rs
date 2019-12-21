@@ -15,7 +15,7 @@ pub enum Mode {
 pub fn remove(names: &Vec<&str>, recursive: bool, mode: Mode) -> Result<(), Error> {
     match mode {
         Mode::Force => force_remove_files(names, recursive),
-        Mode::Interactive => Ok(()),
+        Mode::Interactive => std_remove_files(names, recursive),
         Mode::Standard => std_remove_files(names, recursive),
     }
 }
@@ -48,7 +48,7 @@ pub fn remove_duplicates(names: &Vec<&str>, mode: Mode) -> Result<(), Error> {
     match mode {
         Mode::Standard => std_remove_duplicates(names),
         Mode::Force => force_remove_duplicates(names),
-        Mode::Interactive => Ok(())
+        Mode::Interactive => std_remove_duplicates(names)
     }
 }
 

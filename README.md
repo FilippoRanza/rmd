@@ -39,7 +39,19 @@ or remove duplicates files in a specified directory:
 ```bash
 rmd -d /PATH/TO/DIRECTORY
 ```
+### Note
+Interactive mode is not currently implemented, if the program is run 
+with the **-i** flag it will not behaves differently
 
+So 
+```bash
+rmd -i FILE_A FILE_B
+```
+
+is equivalent to
+```bash
+rmd -i FILE_A FILE_B
+```
 
 
 
