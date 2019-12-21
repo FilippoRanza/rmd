@@ -59,7 +59,7 @@ pub fn remove_duplicates(names: &Vec<&str>, mode: Mode) -> Result<(), Error> {
     match mode {
         Mode::Standard => std_remove_duplicates(names),
         Mode::Force => force_remove_duplicates(names),
-        Mode::Interactive => std_remove_duplicates(names)
+        Mode::Interactive => interactive_remove_duplicates(names)
     }
 }
 
@@ -77,6 +77,17 @@ fn force_remove_duplicates(names: &Vec<&str>) -> Result<(), Error> {
     }
     Ok(())
 }
+
+fn interactive_remove_duplicates(names: &Vec<&str>) -> Result<(), Error> {
+    for name in names.iter() {
+        if io_engine::remove_question(name)? {
+            file_index::remove_duplicates(name)?;
+        }
+        
+    }
+    Ok(())
+}
+
 
 #[cfg(test)]
 mod test {
