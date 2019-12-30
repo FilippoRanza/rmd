@@ -1,6 +1,6 @@
 # rmd
 
-[![Build Status](https://travis-ci.com/FilippoRanza/rmd.svg?branch=master)](https://travis-ci.com/FilippoRanza/rmd) ![crates.io](https://img.shields.io/crates/v/rmd.svg)
+[![Build Status](https://travis-ci.com/FilippoRanza/rmd.svg?branch=master)](https://travis-ci.com/FilippoRanza/rmd) ![crates.io](https://img.shields.io/crates/v/rmd.svg) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 An improved rm implementation able to remove duplicate files
 
@@ -16,7 +16,7 @@ When a file has an hash that has already been found it is removed immediately.
 
 This tool can be easly installed from sources:
 ```bash
-cargo instal rmd
+cargo install rmd
 ```
 
 
