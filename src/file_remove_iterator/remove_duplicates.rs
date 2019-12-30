@@ -35,10 +35,10 @@ impl FileRemove for FileIndex {
     fn remove(&mut self, path: &Path) -> Result<bool, Error> {
         let hash = hash_file(path)?;
         if self.store.contains(&hash) {
-            return Ok(false);
+            return Ok(true);
         }
         self.store.insert(hash);
-        Ok(true)
+        Ok(false)
     }
 }
 
@@ -113,7 +113,7 @@ mod test {
 
         let mut index = FileIndex::new();
         for (n, c) in names.iter().zip(ans.iter()) {
-            let a = index.remove(dir.path().join(n).as_path()).unwrap();
+            let a = !index.remove(dir.path().join(n).as_path()).unwrap();
             assert_eq!(a, *c);
         }
 
