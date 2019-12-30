@@ -3,7 +3,7 @@ use std::io::Error;
 use std::fs::remove_dir_all;
 use std::fs::remove_file;
 
-use super::file_index;
+use super::remove_duplicates;
 use super::io_engine;
 
 pub enum Mode {
@@ -55,7 +55,7 @@ fn remove_wrap(name: &str, rec: bool) -> Result<(), Error> {
 }
 
 
-pub fn remove_duplicates(names: &Vec<&str>, mode: Mode) -> Result<(), Error> {
+pub fn remove_duplicates_files(names: &Vec<&str>, mode: Mode) -> Result<(), Error> {
     match mode {
         Mode::Standard => std_remove_duplicates(names),
         Mode::Force => force_remove_duplicates(names),
@@ -65,7 +65,7 @@ pub fn remove_duplicates(names: &Vec<&str>, mode: Mode) -> Result<(), Error> {
 
 fn std_remove_duplicates(names: &Vec<&str>) -> Result<(), Error> {
     for name in names.iter() {
-        file_index::remove_duplicates(name)?;
+        remove_duplicates::remove_duplicates(name)?;
     }
     Ok(())
 }
@@ -73,7 +73,7 @@ fn std_remove_duplicates(names: &Vec<&str>) -> Result<(), Error> {
 
 fn force_remove_duplicates(names: &Vec<&str>) -> Result<(), Error> {
     for name in names.iter() {
-        let _ = file_index::remove_duplicates(name);
+        let _ = remove_duplicates::remove_duplicates(name);
     }
     Ok(())
 }
@@ -81,7 +81,7 @@ fn force_remove_duplicates(names: &Vec<&str>) -> Result<(), Error> {
 fn interactive_remove_duplicates(names: &Vec<&str>) -> Result<(), Error> {
     for name in names.iter() {
         if io_engine::remove_question(name)? {
-            file_index::remove_duplicates(name)?;
+            remove_duplicates::remove_duplicates(name)?;
         }
         
     }

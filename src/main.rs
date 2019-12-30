@@ -1,7 +1,7 @@
 
 extern crate clap;
 
-use rmd::{remove, remove_duplicates, Mode};
+use rmd::{remove, remove_duplicates_files, Mode};
 
 use clap::{App, Arg, ArgMatches};
 
@@ -58,7 +58,7 @@ fn run_remove<'a>(args: ArgMatches<'a>) -> Result<(), std::io::Error> {
     }
     else {
         let files: Vec<&str> = args.values_of("duplicates").unwrap().collect();
-        remove_duplicates(&files, mode)?;
+        remove_duplicates_files(&files, mode)?;
     }
     Ok(())
 }
