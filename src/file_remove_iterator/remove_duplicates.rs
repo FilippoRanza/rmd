@@ -1,16 +1,14 @@
-
-extern crate ring;
 extern crate data_encoding;
+extern crate ring;
 
-
-use std::io::prelude::*;
-use std::io::Error;
 use std::collections::HashSet;
 use std::fs::File;
+use std::io::prelude::*;
+use std::io::Error;
 use std::path::Path;
 
-use ring::digest::{Context,  SHA256};
 use data_encoding::HEXUPPER;
+use ring::digest::{Context, SHA256};
 
 use crate::file_remove_iterator::file_remove::{file_remover, FileRemove};
 
@@ -20,13 +18,13 @@ pub fn remove_duplicates(path: &str) -> Result<(), Error> {
 }
 
 struct FileIndex {
-    store: HashSet<String>
+    store: HashSet<String>,
 }
 
 impl FileIndex {
     fn new() -> FileIndex {
         FileIndex {
-            store: HashSet::new()
+            store: HashSet::new(),
         }
     }
 }
@@ -42,13 +40,12 @@ impl FileRemove for FileIndex {
     }
 }
 
-
 fn hash_file(path: &Path) -> Result<String, Error> {
     let mut input = File::open(path)?;
     let mut buff = [0; 1024];
     let mut context = Context::new(&SHA256);
-    
-    loop{
+
+    loop {
         let count = input.read(&mut buff)?;
         if count == 0 {
             break;
@@ -61,24 +58,20 @@ fn hash_file(path: &Path) -> Result<String, Error> {
     Ok(hash)
 }
 
-
-
 #[cfg(test)]
 mod test {
 
     extern crate tempfile;
 
     use super::*;
-    use tempfile::{tempdir, TempDir};
+    use std::collections::HashMap;
+    use std::fs::create_dir;
     use std::io::prelude::Write;
     use std::path::PathBuf;
-    use std::fs::create_dir;
-    use std::collections::HashMap;
-
+    use tempfile::{tempdir, TempDir};
 
     #[test]
     fn test_file_hash() {
-
         let dir = tempdir().unwrap();
         let msg = "A RANDOM MESSAGE\n";
         let path = dir.path().to_owned();
@@ -116,9 +109,7 @@ mod test {
             let a = !index.remove(dir.path().join(n).as_path()).unwrap();
             assert_eq!(a, *c);
         }
-
     }
-
 
     #[test]
     fn test_remove_duplicates() {
@@ -126,7 +117,6 @@ mod test {
         let unique = build_unique_file_tree(&temp_dir);
         let duplicates = build_duplicates_file_tree(&temp_dir);
         remove_duplicates(temp_dir.path().to_str().unwrap()).unwrap();
-
 
         for path in unique.iter() {
             let path = path.as_path();
@@ -143,10 +133,7 @@ mod test {
             }
             assert_eq!(count, 1);
         }
-
-
     }
-
 
     fn build_unique_file_tree(dir: &TempDir) -> Vec<PathBuf> {
         let mut output = Vec::new();
@@ -157,7 +144,6 @@ mod test {
             file.write(name.as_bytes()).unwrap();
             output.push(path);
         }
-
 
         let unique_dirs = vec!["dir_a", "dir_b", "dir_c", "dir_d"];
         for unique_dir in unique_dirs.iter() {
@@ -171,9 +157,8 @@ mod test {
             }
         }
 
-        output 
+        output
     }
-
 
     fn build_duplicates_file_tree(dir: &TempDir) -> HashMap<String, Vec<PathBuf>> {
         let mut output = HashMap::new();
@@ -189,9 +174,8 @@ mod test {
 
         output.insert(String::new(), tmp);
 
-
         let dirs = vec!["dir_a", "dir_b", "dir_c", "dir_d"];
-        
+
         for name in duplicates.iter() {
             let mut tmp = Vec::new();
             for d in dirs.iter() {
@@ -203,10 +187,7 @@ mod test {
             }
             output.insert(String::from(*name), tmp);
         }
-        
+
         output
     }
-
-
-
 }

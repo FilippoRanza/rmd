@@ -1,17 +1,15 @@
-
-use std::io::Error;
 use std::fs::remove_dir_all;
 use std::fs::remove_file;
+use std::io::Error;
 
-use super::remove_duplicates;
 use super::io_engine;
+use super::remove_duplicates;
 
 pub enum Mode {
-    Interactive, 
+    Interactive,
     Force,
-    Standard
+    Standard,
 }
-
 
 pub fn remove(names: &Vec<&str>, recursive: bool, mode: Mode) -> Result<(), Error> {
     match mode {
@@ -44,22 +42,19 @@ fn interactive_remove_files(names: &Vec<&str>, rec: bool) -> Result<(), Error> {
     Ok(())
 }
 
-
 fn remove_wrap(name: &str, rec: bool) -> Result<(), Error> {
     if rec {
         remove_dir_all(name)
-    }
-    else {
+    } else {
         remove_file(name)
     }
 }
-
 
 pub fn remove_duplicates_files(names: &Vec<&str>, mode: Mode) -> Result<(), Error> {
     match mode {
         Mode::Standard => std_remove_duplicates(names),
         Mode::Force => force_remove_duplicates(names),
-        Mode::Interactive => interactive_remove_duplicates(names)
+        Mode::Interactive => interactive_remove_duplicates(names),
     }
 }
 
@@ -69,7 +64,6 @@ fn std_remove_duplicates(names: &Vec<&str>) -> Result<(), Error> {
     }
     Ok(())
 }
-
 
 fn force_remove_duplicates(names: &Vec<&str>) -> Result<(), Error> {
     for name in names.iter() {
@@ -83,19 +77,16 @@ fn interactive_remove_duplicates(names: &Vec<&str>) -> Result<(), Error> {
         if io_engine::remove_question(name)? {
             remove_duplicates::remove_duplicates(name)?;
         }
-        
     }
     Ok(())
 }
 
-
 #[cfg(test)]
 mod test {
 
-    use tempfile::TempDir;
-    use std::fs::{File, create_dir};
     use super::*;
-
+    use std::fs::{create_dir, File};
+    use tempfile::TempDir;
 
     #[test]
     fn test_force_remove() {
@@ -124,7 +115,10 @@ mod test {
         let existing_file = dir.path().join("EXIST");
         let _ = File::create(&existing_file).unwrap();
         let not_existing_file = dir.path().join("NON_EXIST");
-        let files = vec![existing_file.to_str().unwrap(), not_existing_file.to_str().unwrap()];
+        let files = vec![
+            existing_file.to_str().unwrap(),
+            not_existing_file.to_str().unwrap(),
+        ];
         remove(&files, false, mode).unwrap();
     }
 
@@ -136,11 +130,13 @@ mod test {
             let tmp = existing_dir.join(letter);
             File::create(tmp).unwrap();
         }
-        
+
         let non_existing_dir = dir.path().join("DIR_B");
 
-        let files = vec![existing_dir.to_str().unwrap(), non_existing_dir.to_str().unwrap()];
+        let files = vec![
+            existing_dir.to_str().unwrap(),
+            non_existing_dir.to_str().unwrap(),
+        ];
         remove(&files, true, mode).unwrap();
     }
-
 }
