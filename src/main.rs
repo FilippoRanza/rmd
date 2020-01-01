@@ -33,7 +33,24 @@ pub fn parse_args<'a>() -> ArgMatches<'a> {
             .help("recursevely remove duplicated file(keep one copy)")
             .takes_value(true)
             .default_value(".")
-            .multiple(true),
+            .multiple(true)
+            .conflicts_with_all(&["older", "newer"]),
+    );
+
+    let parser = parser.arg(
+        Arg::with_name("older")
+            .long("--older")
+            .help("remove file older then the given time specification")
+            .takes_value(true)
+            .conflicts_with_all(&["duplicates", "newer"]),
+    );
+
+    let parser = parser.arg(
+        Arg::with_name("newer")
+            .long("--newer")
+            .help("remove file newer then the given time specification")
+            .takes_value(true)
+            .conflicts_with_all(&["duplicates", "older"]),
     );
 
     let parser = parser.arg(
