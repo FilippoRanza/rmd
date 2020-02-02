@@ -61,7 +61,6 @@ pub fn parse_args<'a>() -> ArgMatches<'a> {
         Arg::with_name("files")
             .multiple(true)
             .help("remove files")
-            .conflicts_with("duplicates"),
     );
 
     parser.get_matches()
@@ -92,13 +91,13 @@ fn run_remove<'a>(args: ArgMatches<'a>) -> Result<(), std::io::Error> {
 
 
     if args.is_present("newer") {
-        let time_stamp = args.value_of("newer").unwrap();
-        remove_new_files(&files, time_stamp, mode)?;
+        let time_spec = args.value_of("newer").unwrap();
+        remove_new_files(&files, time_spec, mode)?; 
     } else if args.is_present("duplicates") {
         remove_duplicates_files(&files, mode)?;
     } else if args.is_present("older") {
-        let time_stamp = args.value_of("older").unwrap();
-        remove_old_files(&files, time_stamp, mode)?;
+        let time_spec = args.value_of("older").unwrap();
+        remove_old_files(&files, time_spec, mode)?;
     } else if args.is_present("files") {
         remove(&files, recursive, mode)?;
     }
