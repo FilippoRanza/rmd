@@ -75,4 +75,43 @@ for i in {a..z} ; do
 done
 
 
+echo "Remove old files"
+
+mkdir "old"
+
+touch old/{a..z}.txt
+# date in year-month-day format
+touch -d '2016-01-01' old/{A..Z}.txt
+# remove file older then 4 years, like {A..Z}.txt
+rmd --older 4y
+
+for i in old/{a..z}.txt ;  do
+    [[ -e "$i" ]] || exit 1
+done
+
+for i in old/{A..Z}.txt ; do 
+    [[ -e "$i" ]] && exit 1
+done
+
+
+echo "Remove new files"
+
+mkdir new
+touch new/{a..z}.txt
+# date in year-month-day format
+touch -d '2017-01-01' new/{A..Z}.txt
+
+# remove file newer than 2 year in new subdirectory
+rmd --newer 2y new
+
+for i in new/{a..z}.txt ;  do
+    [[ -e "$i" ]] && exit 1
+done
+
+for i in new/{A..Z}.txt ; do 
+    [[ -e "$i" ]] || exit 1
+done
+
+
+
 echo "Done"
