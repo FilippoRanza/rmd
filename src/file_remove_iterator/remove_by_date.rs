@@ -12,6 +12,7 @@ const SECONDS_IN_WEEK: u64 = 7 * SECONDS_IN_DAY;
 const SECONDS_IN_MONTH: u64 = 30 * SECONDS_IN_DAY;
 const SECONDS_IN_YEAR: u64 = 365 * SECONDS_IN_DAY;
 
+/*
 pub fn remove_older_then(path: &str, time: &str) -> Result<(), Error> {
     remove_by_date(path, time, true)
 }
@@ -19,8 +20,9 @@ pub fn remove_older_then(path: &str, time: &str) -> Result<(), Error> {
 pub fn remove_newer_then(path: &str, time: &str) -> Result<(), Error> {
     remove_by_date(path, time, false)
 }
+*/
 
-fn remove_by_date(path: &str, time: &str, older: bool) -> Result<(), Error> {
+pub fn remove_by_date(path: &str, time: &str, older: bool) -> Result<(), Error> {
     let time_remove = TimeRemove::new(time, older);
     match time_remove {
         Ok(mut time_remove) => file_remover(path, &mut time_remove),
@@ -228,7 +230,7 @@ mod test {
 
     #[test]
     fn test_remove_wrong_time_format() {
-        let stat = remove_older_then("", "3w4e");
+        let stat = remove_by_date("", "3w4e", true);
         match stat {
             Ok(_) => assert!(false),
             Err(err) => {
@@ -253,7 +255,7 @@ mod test {
         let file_to_keep = temp_dir.path().join("b");
         File::create(&file_to_keep).unwrap();
 
-        remove_older_then(temp_dir.path().to_str().unwrap(), "2s").unwrap();
+        remove_by_date(temp_dir.path().to_str().unwrap(), "2s", true).unwrap();
 
         assert!(file_to_keep.exists());
         assert!(!file_to_remove.exists());
@@ -271,7 +273,7 @@ mod test {
         let file_to_remove = temp_dir.path().join("b");
         File::create(&file_to_remove).unwrap();
 
-        remove_newer_then(temp_dir.path().to_str().unwrap(), "2s").unwrap();
+        remove_by_date(temp_dir.path().to_str().unwrap(), "2s", false).unwrap();
 
         assert!(!file_to_remove.exists());
         assert!(file_to_keep.exists());

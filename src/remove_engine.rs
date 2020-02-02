@@ -4,6 +4,7 @@ use std::io::Error;
 
 use super::io_engine;
 use super::remove_duplicates;
+use super::remove_by_date;
 
 pub enum Mode {
     Interactive,
@@ -80,6 +81,48 @@ fn interactive_remove_duplicates(names: &Vec<&str>) -> Result<(), Error> {
     }
     Ok(())
 }
+
+pub fn remove_old_files(names: &Vec<&str>, time_spec: &str, mode: Mode) -> Result<(), Error> {
+    match mode {
+        Mode::Standard => std_remove_by_date(names, time_spec, true),
+        Mode::Force => force_remove_by_date(names, time_spec, true),
+        Mode::Interactive => interactive_remove_by_date(names, time_spec, true)
+    }
+}
+
+pub fn remove_new_files(names: &Vec<&str>, time_spec: &str, mode: Mode) -> Result<(), Error> {
+    match mode {
+        Mode::Standard => std_remove_by_date(names, time_spec, false),
+        Mode::Force => force_remove_by_date(names, time_spec, false),
+        Mode::Interactive => interactive_remove_by_date(names, time_spec, false)
+    }
+}
+
+fn std_remove_by_date(files: &Vec<&str>, time_spec: &str, older: bool) -> Result<(), Error> {
+    for file in files.iter() {
+        remove_by_date::remove_by_date(file, time_spec, older)?;
+    }
+    Ok(())
+}
+
+fn force_remove_by_date(files: &Vec<&str>, time_spec: &str, older: bool) -> Result<(), Error> {
+    for file in files.iter() {
+        let _ = remove_by_date::remove_by_date(file, time_spec, older);
+    }
+    Ok(())
+}
+
+fn interactive_remove_by_date(files: &Vec<&str>, time_spec: &str, older: bool) -> Result<(), Error> {
+    for file in files.iter() {
+        if io_engine::remove_question(file)? {
+            remove_by_date::remove_by_date(file, time_spec, older)?;
+        }
+    }
+    Ok(())
+}
+
+
+
 
 #[cfg(test)]
 mod test {

@@ -1,6 +1,6 @@
 extern crate clap;
 
-use rmd::{remove, remove_duplicates_files, Mode};
+use rmd::{remove, remove_duplicates_files, Mode, remove_old_files, remove_new_files};
 
 use clap::{App, Arg, ArgMatches};
 
@@ -31,9 +31,6 @@ pub fn parse_args<'a>() -> ArgMatches<'a> {
             .short("-d")
             .long("--duplicates")
             .help("recursevely remove duplicated file(keep one copy)")
-            .takes_value(true)
-            .default_value(".")
-            .multiple(true)
             .conflicts_with_all(&["older", "newer"]),
     );
 
@@ -80,18 +77,32 @@ fn get_mode(force: bool, interactive: bool) -> Mode {
     }
 }
 
+
+
 fn run_remove<'a>(args: ArgMatches<'a>) -> Result<(), std::io::Error> {
     let recursive = args.is_present("recursive");
     let interactive = args.is_present("interactive");
     let force = args.is_present("force");
     let mode = get_mode(force, interactive);
-    if args.is_present("files") {
-        let files: Vec<&str> = args.values_of("files").unwrap().collect();
-        remove(&files, recursive, mode)?;
-    } else {
-        let files: Vec<&str> = args.values_of("duplicates").unwrap().collect();
+
+    let files = match args.values_of("files") {
+        Some(file_args) => file_args.collect(),
+        None => vec!["."]
+    };
+
+
+    if args.is_present("newer") {
+        let time_stamp = args.value_of("newer").unwrap();
+        remove_new_files(&files, time_stamp, mode)?;
+    } else if args.is_present("duplicates") {
         remove_duplicates_files(&files, mode)?;
+    } else if args.is_present("older") {
+        let time_stamp = args.value_of("older").unwrap();
+        remove_old_files(&files, time_stamp, mode)?;
+    } else if args.is_present("files") {
+        remove(&files, recursive, mode)?;
     }
+
     Ok(())
 }
 
