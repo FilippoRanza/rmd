@@ -19,7 +19,7 @@ pub trait FileRemove {
 /// passed as argument to the  remove.remove
 /// if this method returns true the file is removed.
 /// the file is left untouched otherwise
-pub fn file_remover(path: &str, remove: &mut dyn FileRemove) -> Result<(), Error> {
+pub fn file_remover(path: &str, remove: &mut Box<dyn FileRemove>) -> Result<(), Error> {
     for entry in WalkDir::new(path) {
         let entry = entry?;
         if entry.path().is_dir() {

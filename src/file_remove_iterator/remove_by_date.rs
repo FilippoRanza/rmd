@@ -3,7 +3,7 @@ use std::io::{Error, ErrorKind};
 use std::path::Path;
 use std::time::{Duration, SystemTime};
 
-use crate::file_remove_iterator::file_remove::{file_remover, FileRemove};
+use crate::file_remove_iterator::file_remove::FileRemove;
 
 const SECONDS_IN_MINUTE: u64 = 60;
 const SECONDS_IN_HOUR: u64 = 60 * SECONDS_IN_MINUTE;
@@ -12,38 +12,22 @@ const SECONDS_IN_WEEK: u64 = 7 * SECONDS_IN_DAY;
 const SECONDS_IN_MONTH: u64 = 30 * SECONDS_IN_DAY;
 const SECONDS_IN_YEAR: u64 = 365 * SECONDS_IN_DAY;
 
-/*
-pub fn remove_older_then(path: &str, time: &str) -> Result<(), Error> {
-    remove_by_date(path, time, true)
-}
-
-pub fn remove_newer_then(path: &str, time: &str) -> Result<(), Error> {
-    remove_by_date(path, time, false)
-}
-*/
-
-pub fn remove_by_date(path: &str, time: &str, older: bool) -> Result<(), Error> {
-    let time_remove = TimeRemove::new(time, older);
-    match time_remove {
-        Ok(mut time_remove) => file_remover(path, &mut time_remove),
-        Err(ch) => Err(Error::new(
-            ErrorKind::InvalidInput,
-            format!("unknow token '{}' in time specifier '{}'", ch, time),
-        )),
-    }
-}
-
-struct TimeRemove {
+pub struct TimeRemove {
     time: Duration,
     older: bool,
     now: SystemTime,
 }
 
 impl TimeRemove {
-    fn new(time: &str, older: bool) -> Result<TimeRemove, char> {
-        let tmp = TimeRemove::parse_time_str(time)?;
+    pub fn new(time: &str, older: bool) -> std::io::Result<TimeRemove> {
+        let tmp = TimeRemove::parse_time_str(time);
+        if let Err(tmp) = tmp {
+            let err_msg = format!("unknow token '{}' in time specifier '{}'", tmp, time);
+            let err = Error::new(ErrorKind::Other, err_msg);
+            return Err(err);
+        }
         let out = TimeRemove {
-            time: tmp,
+            time: tmp.unwrap(),
             older: older,
             now: SystemTime::now(),
         };
@@ -176,10 +160,6 @@ mod test {
     extern crate tempfile;
 
     use super::*;
-    use std::error;
-    use std::fs::File;
-    use std::thread;
-    use tempfile::TempDir;
 
     #[test]
     fn test_time_parse() {
@@ -226,56 +206,5 @@ mod test {
         let mut parser = Parser::new("1234");
         assert_eq!(parser.next(), Some(Ok((1234, '\0'))));
         assert_eq!(parser.next(), None);
-    }
-
-    #[test]
-    fn test_remove_wrong_time_format() {
-        let stat = remove_by_date("", "3w4e", true);
-        match stat {
-            Ok(_) => assert!(false),
-            Err(err) => {
-                assert_eq!(err.kind(), ErrorKind::InvalidInput);
-                assert_eq!(
-                    error::Error::description(&err),
-                    "unknow token 'e' in time specifier '3w4e'"
-                )
-            }
-        }
-    }
-
-    #[test]
-    fn test_remove_old() {
-        let temp_dir = TempDir::new().unwrap();
-
-        let file_to_remove = temp_dir.path().join("a");
-        File::create(&file_to_remove).unwrap();
-
-        thread::sleep(Duration::new(3, 0));
-
-        let file_to_keep = temp_dir.path().join("b");
-        File::create(&file_to_keep).unwrap();
-
-        remove_by_date(temp_dir.path().to_str().unwrap(), "2s", true).unwrap();
-
-        assert!(file_to_keep.exists());
-        assert!(!file_to_remove.exists());
-    }
-
-    #[test]
-    fn test_remove_newer() {
-        let temp_dir = TempDir::new().unwrap();
-
-        let file_to_keep = temp_dir.path().join("a");
-        File::create(&file_to_keep).unwrap();
-
-        thread::sleep(Duration::new(3, 0));
-
-        let file_to_remove = temp_dir.path().join("b");
-        File::create(&file_to_remove).unwrap();
-
-        remove_by_date(temp_dir.path().to_str().unwrap(), "2s", false).unwrap();
-
-        assert!(!file_to_remove.exists());
-        assert!(file_to_keep.exists());
     }
 }
