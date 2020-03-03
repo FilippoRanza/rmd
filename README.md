@@ -38,7 +38,8 @@ rmd FILE_A FILE_B
 ```bash
 rmd -rf DIR_A
 ```
-
+### Additional Features
+#### Remove Duplicates
 - remove duplicates files in the current directory, and all sub directoris:
 ```bash
 rmd -d
@@ -47,8 +48,79 @@ or remove duplicates files in a specified directory:
 ```bash
 rmd -d /PATH/TO/DIRECTORY
 ```
-### Note
-When working in *interactive* mode and a  remove file is a
-directory **rmd** prompts only once for the root directory
 
+#### Remove by Last Access
+This functionality allows to remove file **older** or **newer** then a given 
+*time-specification*.
+
+Remove File *older* then *time-spec*
+```bash 
+rmd --older <time-spec> [directory...]
+```
+
+Remove File *newer* then *time-spec*
+```bash 
+rmd --newer <time-spec> [directory...]
+```
+
+**rmd** checks if the last access is **before** (so the file is **older**) or **after** 
+(so the file is **newer**) then the time described by the *time-specification*.
+*time-specification* describes a relative amount of time (in **seconds**) in the past 
+from the moment when the program is run. 
+
+*time-specification* format
+```
+[NT]+
+```
+Where:
+- **N** is a number (1-9)
+- **T** is a time descriptor
+- **+** means one or more
+
+Time Descriptor Table
+| Time Descriptor | Meaning | Value             |
+|:----------------|---------|-------------------|
+| s               | second  | 1 second          |
+| m               | minute  | 60 seconds        |
+| h               | hour    | 60 minutes        |
+| d               | day     | 24 hours          |
+| m               | month   | 30 day            |
+| y               | year    | 365 day           |
+ 
+##### Examples
+```bash
+rmd --older 2y4m5d
+```
+will remove in the current directory, and recursivelly in all sub directories, file 
+with a last access time equal or before *2 year, 4 month and 5 days* in the past from
+the time when the program is run. 
+
+```bash 
+rmd --newer 4h30m
+```
+will remove in the current directory, and recursivelly in all sub directories, file 
+with a last access time equal or after *4 hour and 30 minutes* in the past from
+the time when the program is run. 
+
+
+```bash 
+rmd --older 1m15d /home/user/temp-store
+```
+will remove in **/home/user/temp-store** and recursivelly in all sub directories, file 
+with a last access time equal or before *1 mounth and 15 days* in the past from
+the time when the program is run. 
+
+```bash 
+rmd --older 30s /home/user/wrong-downloads
+```
+will remove in **/home/user/wrong-downloads** and recursivelly in all sub directories, file 
+with a last access time equal or after *30 seconds* in the past from
+the time when the program is run. 
+
+
+
+### Note
+- When working in *interactive* mode and a  remove file is a
+directory **rmd** prompts only once for the root directory
+- *newer*, *older*, *recursive* are mutually exclusive.
 
