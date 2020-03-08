@@ -111,7 +111,7 @@ with a last access time equal or before *1 mounth and 15 days* in the past from
 the time when the program is run. 
 
 ```bash 
-rmd --older 30s /home/user/wrong-downloads
+rmd --newer 30s /home/user/wrong-downloads
 ```
 will remove in **/home/user/wrong-downloads** and recursivelly in all sub directories, file 
 with a last access time equal or after *30 seconds* in the past from
