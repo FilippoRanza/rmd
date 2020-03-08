@@ -78,14 +78,15 @@ Where:
 - **+** means one or more
 
 Time Descriptor Table
-| Time Descriptor | Meaning | Value             |
-|:----------------|---------|-------------------|
-| s               | second  | 1 second          |
-| m               | minute  | 60 seconds        |
-| h               | hour    | 60 minutes        |
-| d               | day     | 24 hours          |
-| m               | month   | 30 day            |
-| y               | year    | 365 day           |
+| Short Format | Long  Format| Meaning | Value         |
+|:-------------|-------------|---------|---------------|
+| s            | second      | second  | 1 second      |
+| m            | minute      | minute  | 60 seconds    |
+| h            | hour        | hour    | 60 minutes    |
+| d            | day         | day     | 24 hours      |
+| w            | week        | week    | 7 days        |      
+| m            | month       | month   | 30 days       |
+| y            | year        | year    | 365 days      |
  
 ##### Examples
 ```bash
