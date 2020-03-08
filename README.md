@@ -85,12 +85,12 @@ Time Descriptor Table
 | h            | hour        | hour    | 60 minutes    |
 | d            | day         | day     | 24 hours      |
 | w            | week        | week    | 7 days        |      
-| m            | month       | month   | 30 days       |
+| M            | month       | month   | 30 days       |
 | y            | year        | year    | 365 days      |
  
 ##### Examples
 ```bash
-rmd --older 2y4m5d
+rmd --older 2y4M5d
 ```
 will remove in the current directory, and recursivelly in all sub directories, file 
 with a last access time equal or before *2 year, 4 month and 5 days* in the past from
@@ -105,7 +105,7 @@ the time when the program is run.
 
 
 ```bash 
-rmd --older 1m15d /home/user/temp-store
+rmd --older 1M15d /home/user/temp-store
 ```
 will remove in **/home/user/temp-store** and recursivelly in all sub directories, file 
 with a last access time equal or before *1 mounth and 15 days* in the past from
