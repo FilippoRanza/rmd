@@ -104,6 +104,15 @@ mod test {
         assert_eq!(ans, 0);
     }
 
+    #[test]
+    #[should_panic(expected = "")]
+    fn test_with_wrong_token() {
+        // non alphanumeric are considered as token separator
+        let spec = "34to,n";
+        let ans = run_weight_test(spec).unwrap();
+        assert_eq!(ans, 0);
+    }
+
     fn run_weight_test(spec: &str) -> Result<u64, String> {
         spec_string_parser(spec, |s| match s {
             "k" | "kilo" => Ok(1000),
