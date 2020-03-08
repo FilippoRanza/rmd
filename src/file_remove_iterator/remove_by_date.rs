@@ -1,9 +1,10 @@
-use std::char;
-use std::io::{Error, ErrorKind};
+
+use std::io::{Result, Error, ErrorKind};
 use std::path::Path;
 use std::time::{Duration, SystemTime};
 
 use crate::file_remove_iterator::file_remove::FileRemove;
+use super::parser::spec_string_parser;
 
 const SECONDS_IN_MINUTE: u64 = 60;
 const SECONDS_IN_HOUR: u64 = 60 * SECONDS_IN_MINUTE;
@@ -19,55 +20,52 @@ pub struct TimeRemove {
 }
 
 impl TimeRemove {
-    pub fn new(time: &str, older: bool) -> std::io::Result<TimeRemove> {
-        let tmp = TimeRemove::parse_time_str(time);
-        if let Err(tmp) = tmp {
-            let err_msg = format!("unknow token '{}' in time specifier '{}'", tmp, time);
-            let err = Error::new(ErrorKind::Other, err_msg);
-            return Err(err);
+    pub fn new(time: &str, older: bool) -> Result<Self> {
+        let ans = spec_string_parser(time, |s| {
+            match s {
+                "s"|"second" => Ok(1),
+                "m"|"minute" => Ok(SECONDS_IN_MINUTE),
+                "h"|"hour" => Ok(SECONDS_IN_HOUR),
+                "d"|"day" => Ok(SECONDS_IN_DAY),
+                "w"|"week" => Ok(SECONDS_IN_WEEK),
+                "M"|"month" => Ok(SECONDS_IN_MONTH),
+                "y"|"year" => Ok(SECONDS_IN_YEAR),
+                _ => {
+                    let err_msg = format!("unknown time specifier {}", s);
+                    Err(err_msg)
+                }
+            }
+        });
+        match ans {
+            Ok(time) => Ok(Self::factory(time, older)),
+            Err(msg) => Err(Self::error_factory(msg))
         }
-        let out = TimeRemove {
-            time: tmp.unwrap(),
-            older: older,
-            now: SystemTime::now(),
-        };
-        Ok(out)
     }
 
-    fn convert_time(time_id: char, time_val: u64) -> Result<u64, char> {
-        let out = match time_id {
-            'y' => time_val * SECONDS_IN_YEAR,
-            'M' => time_val * SECONDS_IN_MONTH,
-            'w' => time_val * SECONDS_IN_WEEK,
-            'd' => time_val * SECONDS_IN_DAY,
-            'h' => time_val * SECONDS_IN_HOUR,
-            'm' => time_val * SECONDS_IN_MINUTE,
-            's' => time_val,
-            _ => return Err(time_id),
-        };
-        Ok(out)
-    }
-
-    fn parse_time_str(time: &str) -> Result<Duration, char> {
-        let parser = Parser::new(time);
-        let mut seconds = 0;
-        for token in parser {
-            let (val, ch) = token?;
-            seconds += TimeRemove::convert_time(ch, val)?;
+    fn factory(time: u64, older: bool) -> Self {
+        let time = Duration::new(time, 0);
+        TimeRemove {
+            time,
+            older,
+            now: SystemTime::now()
         }
-        Ok(Duration::new(seconds, 0))
     }
 
-    fn get_time_diff(&self, path: &Path) -> Result<Duration, Error> {
+    fn error_factory(msg: String) -> Error {
+        Error::new(ErrorKind::Other, msg)
+    }
+
+    fn get_time_diff(&self, path: &Path) -> Result<Duration> {
         let metadata = path.metadata()?;
         let access = metadata.accessed()?;
         let diff = self.now.duration_since(access).unwrap();
         Ok(diff)
     }
+
 }
 
 impl FileRemove for TimeRemove {
-    fn remove(&mut self, path: &Path) -> Result<bool, Error> {
+    fn remove(&mut self, path: &Path) -> Result<bool> {
         let time_since_access = self.get_time_diff(path)?;
         if self.older {
             if time_since_access > self.time {
@@ -79,132 +77,5 @@ impl FileRemove for TimeRemove {
             }
         }
         Ok(false)
-    }
-}
-
-enum Status {
-    Init,
-    Number,
-    Letter,
-    Error,
-}
-
-struct Parser<'a> {
-    line: &'a str,
-    curr: usize,
-}
-
-impl<'a> Parser<'a> {
-    fn new(line: &'a str) -> Parser<'a> {
-        Parser { line, curr: 0 }
-    }
-
-    fn get_status(token: char, status: Status) -> Status {
-        match status {
-            Status::Init => {
-                if token.is_digit(10) {
-                    Status::Number
-                } else {
-                    Status::Error
-                }
-            }
-            Status::Number => {
-                if token.is_digit(10) {
-                    Status::Number
-                } else if token.is_alphabetic() {
-                    Status::Letter
-                } else {
-                    Status::Error
-                }
-            }
-            _ => Status::Error,
-        }
-    }
-}
-
-impl<'a> Iterator for Parser<'a> {
-    type Item = Result<(u64, char), char>;
-    fn next(&mut self) -> Option<Result<(u64, char), char>> {
-        if self.curr >= self.line.len() {
-            return None;
-        }
-
-        let iter = &self.line[self.curr..];
-        let mut val: u64 = 0;
-        let mut letter = '\0';
-        let mut stat = Status::Init;
-        for ch in iter.chars() {
-            self.curr += 1;
-            stat = Parser::get_status(ch, stat);
-            match stat {
-                Status::Init => (),
-                Status::Number => {
-                    val *= 10;
-                    let tmp: u64 = ch as u64 - '0' as u64;
-                    val += tmp;
-                }
-                Status::Letter => {
-                    letter = ch;
-                    break;
-                }
-                Status::Error => return Some(Err(ch)),
-            }
-        }
-        Some(Ok((val, letter)))
-    }
-}
-
-#[cfg(test)]
-mod test {
-
-    extern crate tempfile;
-
-    use super::*;
-
-    #[test]
-    fn test_time_parse() {
-        // 1 year + 1 month + 1 week
-        assert_eq!(
-            TimeRemove::parse_time_str("1y1M1w"),
-            Ok(Duration::new(34732800, 0))
-        );
-        // Error
-        assert_eq!(TimeRemove::parse_time_str("1yy"), Err('y'));
-        // 67 day + 1 year -> the order does not metter
-        assert_eq!(
-            TimeRemove::parse_time_str("67d1y"),
-            Ok(Duration::new(37324800, 0))
-        );
-        // 1 year + 1 month + 1 week + 1 day + 1 hour + 1 minute + 1 second
-        assert_eq!(
-            TimeRemove::parse_time_str("1y1M1w1d1h1m1s"),
-            Ok(Duration::new(34822861, 0))
-        );
-    }
-
-    #[test]
-    fn test_time_string_parser() {
-        let mut parser = Parser::new("23a45r2w67y");
-        assert_eq!(parser.next(), Some(Ok((23, 'a'))));
-        assert_eq!(parser.curr, 3);
-        assert_eq!(parser.next(), Some(Ok((45, 'r'))));
-        assert_eq!(parser.curr, 6);
-        assert_eq!(parser.next(), Some(Ok((2, 'w'))));
-        assert_eq!(parser.curr, 8);
-        assert_eq!(parser.next(), Some(Ok((67, 'y'))));
-        assert_eq!(parser.curr, 11);
-        assert_eq!(parser.next(), None);
-
-        let mut parser = Parser::new("rrr");
-        assert_eq!(parser.next(), Some(Err('r')));
-        assert_eq!(parser.curr, 1);
-
-        let mut parser = Parser::new("34r4&");
-        assert_eq!(parser.next(), Some(Ok((34, 'r'))));
-        assert_eq!(parser.next(), Some(Err('&')));
-
-        let mut parser = Parser::new("1234");
-        assert_eq!(parser.next(), Some(Ok((1234, '\0'))));
-        assert_eq!(parser.next(), None);
     }
 }

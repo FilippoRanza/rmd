@@ -1,6 +1,6 @@
 #[derive(Debug, PartialEq)]
 pub enum SpecToken<'a> {
-    Number(i32),
+    Number(u64),
     Text(&'a str),
 }
 
@@ -77,7 +77,7 @@ impl<'a> Iterator for SpecTokenizer<'a> {
         let tmp = &self.string[self.begin..self.end];
         let out = match self.state {
             State::Number => {
-                let n: i32 = tmp.parse().unwrap();
+                let n: u64 = tmp.parse().unwrap();
                 SpecToken::Number(n)
             }
             State::Text => SpecToken::Text(tmp),

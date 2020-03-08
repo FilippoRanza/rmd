@@ -1,11 +1,11 @@
 use super::specification_string_tokenizer::{SpecToken, SpecTokenizer};
 
-pub fn spec_string_parser<F>(spec: &str, f: F) -> Result<i32, String>
+pub fn spec_string_parser<F>(spec: &str, f: F) -> Result<u64, String>
 where
-    F: Fn(&str) -> Result<i32, String>,
+    F: Fn(&str) -> Result<u64, String>,
 {
     let mut previous: Option<SpecToken> = None;
-    let mut total: i32 = 0;
+    let mut total: u64 = 0;
     let mut run_once = false;
     let tokenizer = SpecTokenizer::new(spec);
     for token in tokenizer {
@@ -70,7 +70,7 @@ mod test {
     fn test_with_empty_string() {
         let spec = "";
         let ans = run_weight_test(spec).unwrap();
-        assert_eq!(ans, -1);
+        assert_eq!(ans, 0);
     }
 
     #[test]
@@ -85,7 +85,7 @@ mod test {
     fn test_with_malformatted_specifier() {
         let spec = "3kilo4gram2tn2t45k";
         let ans = run_weight_test(spec).unwrap();
-        assert_eq!(ans, -1);
+        assert_eq!(ans, 0);
     }
 
     #[test]
@@ -93,7 +93,7 @@ mod test {
     fn test_with_wrong_specifier() {
         let spec = "ton43";
         let ans = run_weight_test(spec).unwrap();
-        assert_eq!(ans, -1);
+        assert_eq!(ans, 0);
     }
 
     #[test]
@@ -101,10 +101,10 @@ mod test {
     fn test_with_empty_specifier() {
         let spec = "....";
         let ans = run_weight_test(spec).unwrap();
-        assert_eq!(ans, -1);
+        assert_eq!(ans, 0);
     }
 
-    fn run_weight_test(spec: &str) -> Result<i32, String> {
+    fn run_weight_test(spec: &str) -> Result<u64, String> {
         spec_string_parser(spec, |s| match s {
             "k" | "kilo" => Ok(1000),
             "g" | "gram" => Ok(1),
