@@ -110,15 +110,15 @@ fn build_command<'a>(args: &'a ArgMatches<'a>) -> Option<engine::Command<'a>> {
 
 fn run_remove<'a>(args: ArgMatches<'a>) -> std::io::Result<()> {
     let mode = get_mode(args.is_present("force"), args.is_present("interactive"));
-    let files = match args.values_of("files") {
-        Some(file_args) => file_args.collect(),
-        None => vec!["."],
+    let (files, arg_set) = match args.values_of("files") {
+        Some(file_args) => (file_args.collect(), true),
+        None => (vec!["."], false),
     };
 
     let command = build_command(&args);
     if let Some(command) = command {
         engine::automatic_remove(&files, mode, command)?;
-    } else {
+    } else if arg_set {
         engine::remove(&files, mode, args.is_present("recursive"))?;
     }
 
