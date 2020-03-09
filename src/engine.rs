@@ -5,6 +5,7 @@ use std::fs::{remove_dir_all, remove_file};
 use std::io::Result;
 
 pub enum Command {
+    BySize((String, bool)),
     ByDate((String, bool)),
     Duplicates,
 }
@@ -75,6 +76,10 @@ fn run_remove(
 
 fn make_controller(command: Command) -> Result<Box<dyn file_remove::FileRemove>> {
     match command {
+        Command::BySize((size, smaller)) => {
+            let val = remove_by_size::SizeRemove::new(&size, smaller)?;
+            Ok(Box::new(val))
+        }
         Command::ByDate((time, older)) => {
             let val = remove_by_date::TimeRemove::new(&time, older)?;
             Ok(Box::new(val))
@@ -222,4 +227,58 @@ mod test {
         assert!(!file_to_remove.exists());
         assert!(file_to_keep.exists());
     }
+
+
+    #[test]
+    fn test_remove_larger() {
+        let size_spec = "4kb+140b".to_owned();
+        let base_dir = tempdir().unwrap();
+        let non_remove_files = make_sized_files(&base_dir, "a", 10, 1, 4130);
+        let remove_files = make_sized_files(&base_dir, "b", 10, 4140, 10000);
+        let paths = [base_dir.path().to_str().unwrap()];
+        automatic_remove(&paths, Mode::Standard, Command::BySize((size_spec, false))).unwrap();
+        for f in non_remove_files.iter() {
+            assert!(f.exists());
+        }
+
+        for f in remove_files.iter() {
+            assert!(!f.exists());
+        }
+
+    }
+    #[test]
+    fn test_remove_smaller() {
+        let size_spec = "4kb+140b".to_owned();
+        let base_dir = tempdir().unwrap();
+        let remove_files = make_sized_files(&base_dir, "a", 10, 1, 4140);
+        let non_remove_files = make_sized_files(&base_dir, "b", 10, 4150, 10000);
+        let paths = [base_dir.path().to_str().unwrap()];
+        automatic_remove(&paths, Mode::Standard, Command::BySize((size_spec, true))).unwrap();
+        for f in non_remove_files.iter() {
+            assert!(f.exists());
+        }
+
+        for f in remove_files.iter() {
+            assert!(!f.exists());
+        }
+    }
+
+    fn make_sized_files(base_dir: &TempDir, ext: &str, count: usize,  min_size: usize, max_size: usize) -> Vec<PathBuf>{
+        let mut output = Vec::with_capacity(count);
+        let size_step = (max_size - min_size) / count;
+        let mut base_size = min_size;
+        let buff: [u8; 1] = [0];
+        for i in 0..count {
+            let name = format!("size_temp_file_{}_size{}.{}", i, base_size, ext);
+            let full_name = base_dir.path().join(name);
+            let mut tmp = File::create(&full_name).unwrap();
+            for _ in 0..base_size {
+                tmp.write(&buff).unwrap();
+            }
+            base_size += size_step;
+            output.push(full_name);
+        }
+        output
+    }
+
 }
