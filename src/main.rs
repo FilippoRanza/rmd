@@ -30,7 +30,7 @@ pub fn parse_args<'a>() -> ArgMatches<'a> {
             .short("-d")
             .long("--duplicates")
             .help("recursevely remove duplicated file(keep one copy)")
-            .conflicts_with_all(&["older", "newer"]),
+            .conflicts_with_all(&["older", "newer", "smaller", "larger"]),
     );
 
     let parser = parser.arg(
@@ -38,7 +38,7 @@ pub fn parse_args<'a>() -> ArgMatches<'a> {
             .long("--older")
             .help("remove file older then the given time specification")
             .takes_value(true)
-            .conflicts_with_all(&["duplicates", "newer"]),
+            .conflicts_with_all(&["duplicates", "newer", "smaller", "larger"]),
     );
 
     let parser = parser.arg(
@@ -46,8 +46,25 @@ pub fn parse_args<'a>() -> ArgMatches<'a> {
             .long("--newer")
             .help("remove file newer then the given time specification")
             .takes_value(true)
-            .conflicts_with_all(&["duplicates", "older"]),
+            .conflicts_with_all(&["duplicates", "older",  "smaller", "larger"]),
     );
+
+    let parser = parser.arg(
+        Arg::with_name("smaller")
+            .long("--smaller")
+            .help("remove file smaller then the given size specification")
+            .takes_value(true)
+            .conflicts_with_all(&["duplicates", "older", "newer", "larger"]),
+    );
+
+    let parser = parser.arg(
+        Arg::with_name("larger")
+            .long("--larger")
+            .help("remove file larger then the given size specification")
+            .takes_value(true)
+            .conflicts_with_all(&["duplicates", "older", "newer", "smaller"]),
+    );
+
 
     let parser = parser.arg(
         Arg::with_name("recursive")
@@ -71,15 +88,21 @@ fn get_mode(force: bool, interactive: bool) -> engine::Mode {
     }
 }
 
-fn build_command<'a>(args: &ArgMatches<'a>) -> Option<engine::Command> {
+fn build_command<'a>(args: &'a ArgMatches<'a>) -> Option<engine::Command<'a>> {
     if args.is_present("duplicates") {
         Some(engine::Command::Duplicates)
     } else if args.is_present("older") {
         let time_spec = args.value_of("older").unwrap();
-        Some(engine::Command::ByDate((time_spec.to_owned(), true)))
+        Some(engine::Command::ByDate((time_spec, true)))
     } else if args.is_present("newer") {
         let time_spec = args.value_of("newer").unwrap();
-        Some(engine::Command::ByDate((time_spec.to_owned(), false)))
+        Some(engine::Command::ByDate((time_spec, false)))
+    } else if args.is_present("smaller") {
+        let size_spec = args.value_of("smaller").unwrap();
+        Some(engine::Command::BySize((size_spec, true)))
+    } else if args.is_present("larger") {
+        let size_spec = args.value_of("larger").unwrap();
+        Some(engine::Command::BySize((size_spec, false)))
     } else {
         None
     }

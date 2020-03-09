@@ -4,9 +4,9 @@ use super::io_engine;
 use std::fs::{remove_dir_all, remove_file};
 use std::io::Result;
 
-pub enum Command {
-    BySize((String, bool)),
-    ByDate((String, bool)),
+pub enum Command<'a> {
+    BySize((&'a str, bool)),
+    ByDate((&'a str, bool)),
     Duplicates,
 }
 
@@ -197,7 +197,7 @@ mod test {
         automatic_remove(
             &paths,
             Mode::Standard,
-            Command::ByDate(("2s".to_owned(), true)),
+            Command::ByDate(("2s", true)),
         )
         .unwrap();
 
@@ -220,7 +220,7 @@ mod test {
         automatic_remove(
             &paths,
             Mode::Standard,
-            Command::ByDate(("2s".to_owned(), false)),
+            Command::ByDate(("2s", false)),
         )
         .unwrap();
 
@@ -231,7 +231,7 @@ mod test {
 
     #[test]
     fn test_remove_larger() {
-        let size_spec = "4kb+140b".to_owned();
+        let size_spec = "4kb+140b";
         let base_dir = tempdir().unwrap();
         let non_remove_files = make_sized_files(&base_dir, "a", 10, 1, 4130);
         let remove_files = make_sized_files(&base_dir, "b", 10, 4140, 10000);
@@ -248,7 +248,7 @@ mod test {
     }
     #[test]
     fn test_remove_smaller() {
-        let size_spec = "4kb+140b".to_owned();
+        let size_spec = "4kb+140b";
         let base_dir = tempdir().unwrap();
         let remove_files = make_sized_files(&base_dir, "a", 10, 1, 4140);
         let non_remove_files = make_sized_files(&base_dir, "b", 10, 4150, 10000);
