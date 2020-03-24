@@ -112,6 +112,49 @@ for i in new/{A..Z}.txt ; do
     [[ -e "$i" ]] || exit 1
 done
 
+echo "Remove small files"
+mkdir small
+
+for i in small/{a..z}.txt ; do
+    dd if=/dev/full of="$i" bs=1 count=$(( RANDOM % 100 + 50 )) &> /dev/null
+done
+
+for i in small{A..Z}.txt ; do
+    dd if=/dev/full of="$i" bs=1 count=$(( RANDOM % 1000 + 1000 )) &> /dev/null
+done
+
+rmd --smaller 1kb small
+
+for i in small/{a..z}.txt ; do
+    [[ -e "$i" ]] && exit 1
+done
+
+for i in small{A..Z}.txt ; do
+    [[ -e "$i" ]] || exit 1
+done
+
+echo "Remove large files"
+mkdir large
+
+for i in large/{a..z}.txt ; do
+    dd if=/dev/full of="$i" bs=1 count=$(( RANDOM % 100 + 50 )) &> /dev/null
+done
+
+for i in large/{A..Z}.txt ; do
+    dd if=/dev/full of="$i" bs=1 count=$(( RANDOM % 1000 + 1000 )) &> /dev/null
+done
+
+rmd --larger 1kb large
+
+for i in large/{a..z}.txt ; do
+    [[ -e "$i" ]] || exit 1
+done
+
+for i in large/{A..Z}.txt ; do
+    [[ -e "$i" ]] && exit 1
+done
+
+
 
 
 echo "Done"
