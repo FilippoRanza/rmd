@@ -28,4 +28,5 @@ A quick guide can be found running:
 rmd --help
 ```
 
-For a more complete reference please read the documentation.
+For a more complete reference please read the online documentation.
+https://filipporanza.github.io/rmd/
