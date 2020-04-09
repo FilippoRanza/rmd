@@ -7,7 +7,7 @@ An improved rm implementation able to remove duplicate files
 ## Description 
 **rmd** is an **rm** reimplementation made in pure Rust. It
 is able to:
-- Do standard **rm** workd
+- Do standard **rm** work
 - Recursively remove duplicate files 
 - Recursively remove files by size 
 - Recursively remove files by last access date
