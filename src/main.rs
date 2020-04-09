@@ -6,7 +6,7 @@ use rmd::engine;
 pub fn parse_args<'a>() -> ArgMatches<'a> {
     let parser = App::new("rmd")
         .about("rm able to remove duplicate files")
-        .version("0.3.0")
+        .version("0.4.1")
         .author("Filippo Ranza");
 
     let parser = parser.arg(
@@ -117,7 +117,7 @@ fn run_remove<'a>(args: ArgMatches<'a>) -> std::io::Result<()> {
 
     let command = build_command(&args);
     if let Some(command) = command {
-        engine::automatic_remove(&files, mode, command)?;
+        engine::automatic_remove(&files, mode, command, false)?;
     } else if arg_set {
         engine::remove(&files, mode, args.is_present("recursive"))?;
     }

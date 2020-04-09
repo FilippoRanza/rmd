@@ -1,6 +1,6 @@
 [package]
 name = "rmd"
-version = "0.4.0"
+version = "0.4.1"
 authors = ["Filippo Ranza <filipporanza@gmail.com>"]
 edition = "2018"
 license = "MIT"
@@ -14,7 +14,7 @@ keywords = ["remove", "fileutils", "duplicates", "rm", "cli"]
 [dependencies]
 ring = "0.16.9"
 data-encoding = "2.1.2"
-walkdir = "2.2.9"
 clap = "2.33.0"
+
 [dev-dependencies]
 tempfile = "3.1.0"
