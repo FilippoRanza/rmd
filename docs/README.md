@@ -207,9 +207,15 @@ with a size smaller or equal to *30 Kilobytes*.
 ### Note
 - When working in *interactive* mode and a  remove file is a
 directory **rmd** prompts only once for the root directory
-- *newer*, *older*, *recursive*, *smaller*, *larger* are mutually exclusive.
+- *newer*, *older*, *duplicates*, *smaller*, *larger* are mutually exclusive.
 - Specification String, in both time and size remove, can contain any number of
 non alphanumeric characters between a number and a descriptor or between a descriptor and
 a number, those characters are simply treated as separators.
 The important thing are to **NOT** put sperators into numbers or into descriptors and to 
 properly quote the specification string so it will be treated as a unique argument.
+
+- *-c*/*--clean* flag deletes directories left empty after an automatic file removal,
+(i.e. **rm** run with *newer*, *older*, *duplicates*, *smaller*, *larger*).
+This operation is done from the bottom of the directory tree, so directories that contains only directoies (recursively) without any file are considered empty.
+So, although not technically empty
+those directoies will be removed. Pay attention ;-). 
