@@ -84,8 +84,9 @@ Where:
 - **+** means one or more
 
 Time Descriptor Table
+
 | Short Format | Long  Format| Meaning | Value         |
-|:-------------|-------------|---------|---------------|
+|--------------|-------------|---------|---------------|
 | s            | second      | second  | 1 second      |
 | m            | minute      | minute  | 60 seconds    |
 | h            | hour        | hour    | 60 minutes    |
@@ -154,8 +155,9 @@ Where:
 - **+** means one or more
 
 Deciamal Size Descriptor Table
+
 | Short Format | Long  Format| Meaning | Value         |
-|:-------------|-------------|---------|---------------|
+|--------------|-------------|---------|---------------|
 |         b    |             | byte    | 1 byte        |
 |kb            |kilo         |kilobyte |1000 byte      |
 |mb            |mega         |megabyte |1000 kilobyte  |
@@ -164,8 +166,9 @@ Deciamal Size Descriptor Table
 |pb            |peta         |petabyte |1000 terabyte  |
 
 Binary Size Descriptor Table
+
 | Short Format | Long  Format| Meaning | Value         |
-|:-------------|-------------|---------|---------------|
+|--------------|-------------|---------|---------------|
 |         b    |             | byte    | 1 byte        |
 |kib           |kibi         |kibibyte |1024 byte      |
 |mib           |mebi         |mebibyte |1024 kibibyte  |
