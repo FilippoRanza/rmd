@@ -154,7 +154,25 @@ for i in large/{A..Z}.txt ; do
     [[ -e "$i" ]] && exit 1
 done
 
+echo "clean empty directories"
+mkdir -p not_clean/{a..z}
+touch not_clean/{a..z}/{a..z}.txt
 
+cp -r not_clean clean
 
+rmd -d not_clean
+for dir in not_clean/{a..z} ; do
+    [[ -e "$dir" ]] || exit 1
+done
+
+rmd -d -c clean
+(( count = 0 ))
+for dir in clean/{a..z} ; do
+    if [[ -e "$dir" ]] ; then
+        (( count++ ))
+    fi
+done
+
+(( count == 1 )) || exit 1
 
 echo "Done"

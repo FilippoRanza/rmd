@@ -56,7 +56,7 @@ fn run_remove(
     path: &str,
     mode: &Mode,
     controller: &mut Box<dyn file_remove::FileRemove>,
-    clean: bool
+    clean: bool,
 ) -> Result<()> {
     match mode {
         Mode::Standard => {
@@ -195,13 +195,7 @@ mod test {
         let file_to_keep = temp_dir.path().join("b");
         File::create(&file_to_keep).unwrap();
         let paths = [temp_dir.path().to_str().unwrap()];
-        automatic_remove(
-            &paths,
-            Mode::Standard,
-            Command::ByDate(("2s", true)),
-            false
-        )
-        .unwrap();
+        automatic_remove(&paths, Mode::Standard, Command::ByDate(("2s", true)), false).unwrap();
 
         assert!(file_to_keep.exists());
         assert!(!file_to_remove.exists());
@@ -223,14 +217,13 @@ mod test {
             &paths,
             Mode::Standard,
             Command::ByDate(("2s", false)),
-            false
+            false,
         )
         .unwrap();
 
         assert!(!file_to_remove.exists());
         assert!(file_to_keep.exists());
     }
-
 
     #[test]
     fn test_remove_larger() {
@@ -239,7 +232,13 @@ mod test {
         let non_remove_files = make_sized_files(&base_dir, "a", 10, 1, 4130);
         let remove_files = make_sized_files(&base_dir, "b", 10, 4140, 10000);
         let paths = [base_dir.path().to_str().unwrap()];
-        automatic_remove(&paths, Mode::Standard, Command::BySize((size_spec, false)), false).unwrap();
+        automatic_remove(
+            &paths,
+            Mode::Standard,
+            Command::BySize((size_spec, false)),
+            false,
+        )
+        .unwrap();
         for f in non_remove_files.iter() {
             assert!(f.exists());
         }
@@ -247,7 +246,6 @@ mod test {
         for f in remove_files.iter() {
             assert!(!f.exists());
         }
-
     }
     #[test]
     fn test_remove_smaller() {
@@ -256,7 +254,13 @@ mod test {
         let remove_files = make_sized_files(&base_dir, "a", 10, 1, 4140);
         let non_remove_files = make_sized_files(&base_dir, "b", 10, 4150, 10000);
         let paths = [base_dir.path().to_str().unwrap()];
-        automatic_remove(&paths, Mode::Standard, Command::BySize((size_spec, true)), false).unwrap();
+        automatic_remove(
+            &paths,
+            Mode::Standard,
+            Command::BySize((size_spec, true)),
+            false,
+        )
+        .unwrap();
         for f in non_remove_files.iter() {
             assert!(f.exists());
         }
@@ -266,7 +270,13 @@ mod test {
         }
     }
 
-    fn make_sized_files(base_dir: &TempDir, ext: &str, count: usize,  min_size: usize, max_size: usize) -> Vec<PathBuf>{
+    fn make_sized_files(
+        base_dir: &TempDir,
+        ext: &str,
+        count: usize,
+        min_size: usize,
+        max_size: usize,
+    ) -> Vec<PathBuf> {
         let mut output = Vec::with_capacity(count);
         let size_step = (max_size - min_size) / count;
         let mut base_size = min_size;
@@ -284,7 +294,6 @@ mod test {
         output
     }
 
-
     #[test]
     fn test_remove_duplicates_and_clean() {
         let temp_dir = TempDir::new().unwrap();
@@ -293,14 +302,13 @@ mod test {
         let empty_dirs_after_removal = ["e", "f", "g", "h"];
         let non_empty_dirs = ["i", "l", "m", "n"];
 
-
         //this directories will be ignored as the are mean to be empty
         let _ = create_empty_sub_dirs(temp_dir.path(), &empty_dirs);
 
         // this directories will contain the same files, all but one will be removed
         let dup_dir_paths = create_empty_sub_dirs(temp_dir.path(), &empty_dirs_after_removal);
         create_files(&dup_dir_paths, false);
-        
+
         // this directories will contain unique files
         let uni_dir_path = create_empty_sub_dirs(temp_dir.path(), &non_empty_dirs);
         create_files(&uni_dir_path, true);
@@ -323,19 +331,25 @@ mod test {
         let mut file = File::create(&name).unwrap();
         file.write(&[0, 1, 2, 3, 4]).unwrap();
 
-        automatic_remove(&[temp_dir.path().to_str().unwrap()], Mode::Standard, Command::Duplicates, true).unwrap();
+        automatic_remove(
+            &[temp_dir.path().to_str().unwrap()],
+            Mode::Standard,
+            Command::Duplicates,
+            true,
+        )
+        .unwrap();
 
         assert!(!full_path_empty.exists());
         assert!(existing_dir.exists());
         assert!(!empty_sub_dir.exists());
 
-        for dir in &empty_dirs{
+        for dir in &empty_dirs {
             let tmp = temp_dir.path().join(dir);
             assert!(!tmp.exists());
         }
 
         let mut count = 0;
-        for dir in &empty_dirs_after_removal{
+        for dir in &empty_dirs_after_removal {
             let tmp = temp_dir.path().join(dir);
             if tmp.exists() {
                 count += 1;
@@ -348,14 +362,13 @@ mod test {
 
         assert_eq!(count, 1);
 
-        for dir in &non_empty_dirs{
+        for dir in &non_empty_dirs {
             let tmp = temp_dir.path().join(dir);
             assert!(tmp.exists());
         }
-
     }
-    
-    fn create_files(dirs: &[PathBuf],unique: bool) -> Vec<PathBuf> {
+
+    fn create_files(dirs: &[PathBuf], unique: bool) -> Vec<PathBuf> {
         let mut output = Vec::with_capacity(dirs.len());
         for dir in dirs {
             let tmp = dir.join("File");
@@ -379,5 +392,4 @@ mod test {
         }
         output
     }
-
 }

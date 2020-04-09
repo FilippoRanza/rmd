@@ -1,9 +1,7 @@
-
 use std::io::Error;
 use std::path::Path;
 
-use std::fs::{remove_file, read_dir, remove_dir};
-
+use std::fs::{read_dir, remove_dir, remove_file};
 
 /// This trait's implementation
 /// can be passed as argument to file_remover.
@@ -18,8 +16,11 @@ pub trait FileRemove {
 /// passed as argument to the  remove.remove
 /// if this method returns true the file is removed.
 /// the file is left untouched otherwise
-pub fn file_remover(path: &str, remove: &mut Box<dyn FileRemove>, clean: bool) -> Result<bool, Error> {
-
+pub fn file_remover(
+    path: &str,
+    remove: &mut Box<dyn FileRemove>,
+    clean: bool,
+) -> Result<bool, Error> {
     let mut empty = true;
     for entry in read_dir(path)? {
         let entry = entry?;

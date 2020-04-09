@@ -1,7 +1,6 @@
-
-use std::path::Path;
-use std::io::{Error, ErrorKind};
 use std::fs::metadata;
+use std::io::{Error, ErrorKind};
+use std::path::Path;
 
 use super::file_remove::FileRemove;
 use super::parser::spec_string_parser;
@@ -22,10 +21,9 @@ const GIBI_BYTE: u64 = 1024 * MEBI_BYTE;
 const TEBI_BYTE: u64 = 1024 * GIBI_BYTE;
 const PEBI_BYTE: u64 = 1024 * TEBI_BYTE;
 
-
 pub struct SizeRemove {
     size: u64,
-    smaller: bool
+    smaller: bool,
 }
 
 impl SizeRemove {
@@ -33,7 +31,7 @@ impl SizeRemove {
         let tmp = Self::size_converter(size_spec);
         match tmp {
             Ok(size) => Ok(Self::factory(size, smaller)),
-            Err(msg) => Err(Self::error_factory(msg))
+            Err(msg) => Err(Self::error_factory(msg)),
         }
     }
 
@@ -42,33 +40,29 @@ impl SizeRemove {
             match s {
                 "b" => Ok(BYTE),
                 // standard SI
-                "kb"|"kilo" => Ok(KILO_BYTE),
-                "mb"|"mega" => Ok(MEGA_BYTE),
-                "gb"|"giga" => Ok(GIGA_BYTE),
-                "tb"|"tera" => Ok(TERA_BYTE),
-                "pb"|"peta" => Ok(PETA_BYTE),
+                "kb" | "kilo" => Ok(KILO_BYTE),
+                "mb" | "mega" => Ok(MEGA_BYTE),
+                "gb" | "giga" => Ok(GIGA_BYTE),
+                "tb" | "tera" => Ok(TERA_BYTE),
+                "pb" | "peta" => Ok(PETA_BYTE),
                 // binary
-                "kib"|"kibi" => Ok(KIBI_BYTE),
-                "mib"|"mebi" => Ok(MEBI_BYTE),
-                "gib"|"gibi" => Ok(GIBI_BYTE),
-                "tib"|"tebi" => Ok(TEBI_BYTE),
-                "pib"|"pebi" => Ok(PEBI_BYTE),
-                _ => Err(format!("unknown size specifier {}", s))
+                "kib" | "kibi" => Ok(KIBI_BYTE),
+                "mib" | "mebi" => Ok(MEBI_BYTE),
+                "gib" | "gibi" => Ok(GIBI_BYTE),
+                "tib" | "tebi" => Ok(TEBI_BYTE),
+                "pib" | "pebi" => Ok(PEBI_BYTE),
+                _ => Err(format!("unknown size specifier {}", s)),
             }
         })
     }
 
     fn factory(size: u64, smaller: bool) -> Self {
-        SizeRemove {
-            size,
-            smaller
-        }
+        SizeRemove { size, smaller }
     }
 
     fn error_factory(msg: String) -> Error {
         Error::new(ErrorKind::Other, msg)
     }
-
 }
 
 impl FileRemove for SizeRemove {
@@ -103,9 +97,6 @@ mod test {
 
     fn run_test(spec: &str, size: u64) {
         let tmp = SizeRemove::size_converter(spec).unwrap();
-        assert_eq!(tmp, size); 
+        assert_eq!(tmp, size);
     }
-
 }
-
-

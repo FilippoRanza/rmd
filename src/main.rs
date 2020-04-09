@@ -1,6 +1,6 @@
 extern crate clap;
 
-use clap::{App, Arg, ArgMatches};
+use clap::{App, Arg, ArgGroup, ArgMatches};
 use rmd::engine;
 
 pub fn parse_args<'a>() -> ArgMatches<'a> {
@@ -18,6 +18,13 @@ pub fn parse_args<'a>() -> ArgMatches<'a> {
     );
 
     let parser = parser.arg(
+        Arg::with_name("clean")
+            .short("-c")
+            .long("--clean")
+            .help("remove directories left empty after an automatic removal"),
+    );
+
+    let parser = parser.arg(
         Arg::with_name("interactive")
             .short("-i")
             .long("--inter")
@@ -29,42 +36,44 @@ pub fn parse_args<'a>() -> ArgMatches<'a> {
         Arg::with_name("duplicates")
             .short("-d")
             .long("--duplicates")
-            .help("recursevely remove duplicated file(keep one copy)")
-            .conflicts_with_all(&["older", "newer", "smaller", "larger"]),
+            .help("recursevely remove duplicated file(keep one copy)"),
     );
 
     let parser = parser.arg(
         Arg::with_name("older")
             .long("--older")
             .help("remove file older then the given time specification")
-            .takes_value(true)
-            .conflicts_with_all(&["duplicates", "newer", "smaller", "larger"]),
+            .takes_value(true),
     );
 
     let parser = parser.arg(
         Arg::with_name("newer")
             .long("--newer")
             .help("remove file newer then the given time specification")
-            .takes_value(true)
-            .conflicts_with_all(&["duplicates", "older",  "smaller", "larger"]),
+            .takes_value(true),
     );
 
     let parser = parser.arg(
         Arg::with_name("smaller")
             .long("--smaller")
             .help("remove file smaller then the given size specification")
-            .takes_value(true)
-            .conflicts_with_all(&["duplicates", "older", "newer", "larger"]),
+            .takes_value(true),
     );
 
     let parser = parser.arg(
         Arg::with_name("larger")
             .long("--larger")
             .help("remove file larger then the given size specification")
-            .takes_value(true)
-            .conflicts_with_all(&["duplicates", "older", "newer", "smaller"]),
+            .takes_value(true),
     );
 
+    let parser = parser.group(ArgGroup::with_name("automatic removal").args(&[
+        "older",
+        "newer",
+        "smaller",
+        "larger",
+        "duplicates",
+    ]));
 
     let parser = parser.arg(
         Arg::with_name("recursive")
@@ -117,7 +126,8 @@ fn run_remove<'a>(args: ArgMatches<'a>) -> std::io::Result<()> {
 
     let command = build_command(&args);
     if let Some(command) = command {
-        engine::automatic_remove(&files, mode, command, false)?;
+        let clean = args.is_present("clean");
+        engine::automatic_remove(&files, mode, command, clean)?;
     } else if arg_set {
         engine::remove(&files, mode, args.is_present("recursive"))?;
     }
