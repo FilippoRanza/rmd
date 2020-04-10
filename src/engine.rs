@@ -1,5 +1,6 @@
 use super::file_remove_iterator::*;
 use super::io_engine;
+use super::logger::StatusLogger;
 
 use std::fs::{remove_dir_all, remove_file};
 use std::io::Result;
@@ -16,17 +17,29 @@ pub enum Mode {
     Interactive,
 }
 
-pub fn automatic_remove(paths: &[&str], mode: Mode, command: Command, clean: bool) -> Result<()> {
+pub fn automatic_remove(
+    paths: &[&str],
+    mode: Mode,
+    command: Command,
+    clean: bool,
+    log: &mut Option<StatusLogger>,
+) -> Result<()> {
     let mut controller = make_controller(command)?;
     for path in paths.iter() {
-        run_remove(path, &mode, &mut controller, clean)?;
+        run_remove(path, &mode, &mut controller, clean, log)?;
     }
 
     Ok(())
 }
 
-pub fn remove(file_name: &[&str], mode: Mode, recursive: bool) -> Result<()> {
+pub fn remove(
+    file_name: &[&str],
+    mode: Mode,
+    recursive: bool,
+    log: &mut Option<StatusLogger>,
+) -> Result<()> {
     for file in file_name {
+        let mut done = true;
         match mode {
             Mode::Standard => {
                 remove_wrap(file, recursive)?;
@@ -37,7 +50,14 @@ pub fn remove(file_name: &[&str], mode: Mode, recursive: bool) -> Result<()> {
             Mode::Interactive => {
                 if io_engine::remove_question(file)? {
                     remove_wrap(file, recursive)?;
+                } else {
+                    done = false;
                 }
+            }
+        }
+        if done {
+            if let Some(log) = log {
+                log.log_file_remove(file)?;
             }
         }
     }
@@ -57,17 +77,18 @@ fn run_remove(
     mode: &Mode,
     controller: &mut Box<dyn file_remove::FileRemove>,
     clean: bool,
+    log: &mut Option<StatusLogger>,
 ) -> Result<()> {
     match mode {
         Mode::Standard => {
-            file_remove::file_remover(path, controller, clean)?;
+            file_remove::file_remover(path, controller, clean, log)?;
         }
         Mode::Force => {
-            let _ = file_remove::file_remover(path, controller, clean);
+            let _ = file_remove::file_remover(path, controller, clean, log);
         }
         Mode::Interactive => {
             if io_engine::remove_question(path)? {
-                file_remove::file_remover(path, controller, clean)?;
+                file_remove::file_remover(path, controller, clean, log)?;
             }
         }
     }
@@ -108,7 +129,14 @@ mod test {
         let unique = build_unique_file_tree(&temp_dir);
         let duplicates = build_duplicates_file_tree(&temp_dir);
         let paths = [temp_dir.path().to_str().unwrap()];
-        automatic_remove(&paths, Mode::Standard, Command::Duplicates, false).unwrap();
+        automatic_remove(
+            &paths,
+            Mode::Standard,
+            Command::Duplicates,
+            false,
+            &mut None,
+        )
+        .unwrap();
 
         for path in unique.iter() {
             let path = path.as_path();
@@ -195,7 +223,14 @@ mod test {
         let file_to_keep = temp_dir.path().join("b");
         File::create(&file_to_keep).unwrap();
         let paths = [temp_dir.path().to_str().unwrap()];
-        automatic_remove(&paths, Mode::Standard, Command::ByDate(("2s", true)), false).unwrap();
+        automatic_remove(
+            &paths,
+            Mode::Standard,
+            Command::ByDate(("2s", true)),
+            false,
+            &mut None,
+        )
+        .unwrap();
 
         assert!(file_to_keep.exists());
         assert!(!file_to_remove.exists());
@@ -218,6 +253,7 @@ mod test {
             Mode::Standard,
             Command::ByDate(("2s", false)),
             false,
+            &mut None,
         )
         .unwrap();
 
@@ -237,6 +273,7 @@ mod test {
             Mode::Standard,
             Command::BySize((size_spec, false)),
             false,
+            &mut None,
         )
         .unwrap();
         for f in non_remove_files.iter() {
@@ -259,6 +296,7 @@ mod test {
             Mode::Standard,
             Command::BySize((size_spec, true)),
             false,
+            &mut None,
         )
         .unwrap();
         for f in non_remove_files.iter() {
@@ -336,6 +374,7 @@ mod test {
             Mode::Standard,
             Command::Duplicates,
             true,
+            &mut None,
         )
         .unwrap();
 

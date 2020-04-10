@@ -2,6 +2,7 @@ extern crate clap;
 
 use clap::{App, Arg, ArgGroup, ArgMatches};
 use rmd::engine;
+use rmd::logger;
 
 pub fn parse_args<'a>() -> ArgMatches<'a> {
     let parser = App::new("rmd")
@@ -67,6 +68,14 @@ pub fn parse_args<'a>() -> ArgMatches<'a> {
             .takes_value(true),
     );
 
+    let parser = parser.arg(
+        Arg::with_name("verbose")
+            .short("-v")
+            .long("--verbose")
+            .multiple(true)
+            .help("print remove status, use multiple twice for a more verbose output"),
+    );
+
     let parser = parser.group(ArgGroup::with_name("automatic removal").args(&[
         "older",
         "newer",
@@ -119,6 +128,14 @@ fn build_command<'a>(args: &'a ArgMatches<'a>) -> Option<engine::Command<'a>> {
 
 fn run_remove<'a>(args: ArgMatches<'a>) -> std::io::Result<()> {
     let mode = get_mode(args.is_present("force"), args.is_present("interactive"));
+
+    let mut log = if args.is_present("verbose") {
+        let count = args.occurrences_of("verbose");
+        Some(logger::StatusLogger::new(count))
+    } else {
+        None
+    };
+
     let (files, arg_set) = match args.values_of("files") {
         Some(file_args) => (file_args.collect(), true),
         None => (vec!["."], false),
@@ -127,9 +144,13 @@ fn run_remove<'a>(args: ArgMatches<'a>) -> std::io::Result<()> {
     let command = build_command(&args);
     if let Some(command) = command {
         let clean = args.is_present("clean");
-        engine::automatic_remove(&files, mode, command, clean)?;
+        engine::automatic_remove(&files, mode, command, clean, &mut log)?;
     } else if arg_set {
-        engine::remove(&files, mode, args.is_present("recursive"))?;
+        engine::remove(&files, mode, args.is_present("recursive"), &mut log)?;
+    }
+
+    if let Some(mut log) = log {
+        log.log_statistics();
     }
 
     Ok(())
