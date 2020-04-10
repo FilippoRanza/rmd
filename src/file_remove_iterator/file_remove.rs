@@ -1,4 +1,4 @@
-use crate::logger::StatusLogger;
+use crate::logger;
 use std::io::Error;
 use std::path::Path;
 
@@ -21,7 +21,7 @@ pub fn file_remover(
     path: &str,
     remove: &mut Box<dyn FileRemove>,
     clean: bool,
-    log: &mut Option<StatusLogger>,
+    log: &mut Option<logger::StatusLogger>,
 ) -> Result<bool, Error> {
     let mut empty = true;
     for entry in read_dir(path)? {
@@ -31,19 +31,17 @@ pub fn file_remover(
             let rm_dir = file_remover(dir_path.to_str().unwrap(), remove, clean, log)?;
             if rm_dir {
                 if clean {
+                    logger::add_file_remove_log(log, &dir_path)?;
                     remove_dir(&dir_path)?;
-                    if let Some(log) = log {
-                        log.log_file_remove(&dir_path)?;
-                    }
+                    logger::output_file_remove_log(log);
                 }
             } else {
                 empty = false;
             }
         } else if remove.remove(&entry.path())? {
+            logger::add_file_remove_log(log, &entry.path())?;
             remove_file(entry.path())?;
-            if let Some(log) = log {
-                log.log_file_remove(entry.path())?;
-            }
+            logger::output_file_remove_log(log);
         } else {
             empty = false;
         }

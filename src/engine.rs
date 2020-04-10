@@ -1,6 +1,6 @@
 use super::file_remove_iterator::*;
 use super::io_engine;
-use super::logger::StatusLogger;
+use super::logger;
 
 use std::fs::{remove_dir_all, remove_file};
 use std::io::Result;
@@ -22,7 +22,7 @@ pub fn automatic_remove(
     mode: Mode,
     command: Command,
     clean: bool,
-    log: &mut Option<StatusLogger>,
+    log: &mut Option<logger::StatusLogger>,
 ) -> Result<()> {
     let mut controller = make_controller(command)?;
     for path in paths.iter() {
@@ -36,10 +36,11 @@ pub fn remove(
     file_name: &[&str],
     mode: Mode,
     recursive: bool,
-    log: &mut Option<StatusLogger>,
+    log: &mut Option<logger::StatusLogger>,
 ) -> Result<()> {
     for file in file_name {
         let mut done = true;
+        logger::add_file_remove_log(log, file)?;
         match mode {
             Mode::Standard => {
                 remove_wrap(file, recursive)?;
@@ -56,9 +57,7 @@ pub fn remove(
             }
         }
         if done {
-            if let Some(log) = log {
-                log.log_file_remove(file)?;
-            }
+            logger::output_file_remove_log(log);
         }
     }
     Ok(())
@@ -77,7 +76,7 @@ fn run_remove(
     mode: &Mode,
     controller: &mut Box<dyn file_remove::FileRemove>,
     clean: bool,
-    log: &mut Option<StatusLogger>,
+    log: &mut Option<logger::StatusLogger>,
 ) -> Result<()> {
     match mode {
         Mode::Standard => {
