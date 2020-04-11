@@ -15,6 +15,8 @@ keywords = ["remove", "fileutils", "duplicates", "rm", "cli"]
 ring = "0.16.9"
 data-encoding = "2.1.2"
 clap = "2.33.0"
+syslog = "5.0"
+log = "0.4"
 
 [dev-dependencies]
 tempfile = "3.1.0"

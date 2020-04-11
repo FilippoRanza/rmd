@@ -76,6 +76,14 @@ pub fn parse_args<'a>() -> ArgMatches<'a> {
             .help("print remove status, use multiple twice for a more verbose output"),
     );
 
+    let parser = parser.arg(
+        Arg::with_name("log")
+            .short("-l")
+            .long("--log")
+            .multiple(true)
+            .help("send status messages to syslog"),
+    );
+
     let parser = parser.group(ArgGroup::with_name("automatic removal").args(&[
         "older",
         "newer",
@@ -126,15 +134,28 @@ fn build_command<'a>(args: &'a ArgMatches<'a>) -> Option<engine::Command<'a>> {
     }
 }
 
-fn run_remove<'a>(args: ArgMatches<'a>) -> std::io::Result<()> {
-    let mode = get_mode(args.is_present("force"), args.is_present("interactive"));
+fn build_logger<'a>(args: &'a ArgMatches<'a>) -> Option<logger::StatusLogger> {
 
-    let mut log = if args.is_present("verbose") {
-        let count = args.occurrences_of("verbose");
-        Some(logger::StatusLogger::new(count))
+    let mut status_logger = logger::StatusLogger::new();
+    if args.is_present("verbose") {
+        let level = logger::get_levle_from_int(args.occurrences_of("verbose"));
+        status_logger.add_verbose(level);
+    }
+    
+    if args.is_present("log") {
+        let level = logger::get_levle_from_int(args.occurrences_of("log"));
+        status_logger.add_logger(level);
+    }
+
+    if status_logger.is_used() {
+        Some(status_logger)
     } else {
         None
-    };
+    }
+}
+
+fn run_remove<'a>(args: ArgMatches<'a>) -> std::io::Result<()> {
+    let mode = get_mode(args.is_present("force"), args.is_present("interactive"));
 
     let (files, arg_set) = match args.values_of("files") {
         Some(file_args) => (file_args.collect(), true),
@@ -142,6 +163,7 @@ fn run_remove<'a>(args: ArgMatches<'a>) -> std::io::Result<()> {
     };
 
     let command = build_command(&args);
+    let mut log = build_logger(&args);
     if let Some(command) = command {
         let clean = args.is_present("clean");
         engine::automatic_remove(&files, mode, command, clean, &mut log)?;
