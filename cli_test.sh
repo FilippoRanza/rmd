@@ -175,4 +175,29 @@ done
 
 (( count == 1 )) || exit 1
 
+
+mkdir verbose_test
+mkdir -p verbose_test/{a..z}
+
+# 26 * 26 files
+for dir in verbose_test/* ; do
+    for file in {a..z}.txt ; do
+        echo "abcd" > "$dir"/"$file"
+    done
+done
+
+# total size (4 + 1) * 26 * 26 = 2704, there's the newline
+rmd -vv -c --smaller 1kb verbose_test | grep '3.38 kb freed' || exit 1
+
+for dir in verbose_test/{a..z} ; do
+    [[ -e "$dir" ]] && exit 1
+done
+
+for i in {a..f} ; do 
+    dd if=/dev/random of=verbose_test/"$i" count=1000 bs=1 &> /dev/null
+done
+
+echo -e "y\nn\ny\nn\ny\n" | rmd -vv -i verbose_test/* | grep '3.00 kb freed' || exit 1
+
+
 echo "Done"

@@ -191,7 +191,7 @@ impl LogBuilder {
         } else {
             let meta = file.metadata()?;
             let size = meta.len();
-            self.curr_size += size;
+            self.curr_size = size;
             self.is_dir = false;
         }
         Ok(self.curr_size)
