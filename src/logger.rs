@@ -95,6 +95,8 @@ impl StatusLogger {
     total_size: u64,
     file_count: usize,
     dir_count: usize,
+    curr_size: u64,
+    is_dir: bool,
     cache_log: String,
     level: VerboseLevel,
     kind: Kind,
@@ -111,6 +113,10 @@ impl LogBuilder {
             total_size: 0,
             file_count: 0,
             dir_count: 0,
+
+            curr_size: 0,
+            is_dir: false,
+
             level,
             cache_log: String::new(),
             kind,
@@ -122,6 +128,7 @@ impl LogBuilder {
     }
 
     fn inner_log_file_remove(&mut self, file: &Path) -> Result<()> {
+        self.cache_log.clear();
         let size = self.update_stat(file)?;
         let result = match self.level {
             VerboseLevel::Low => writeln!(&mut self.cache_log, "{:?}", file),
@@ -143,11 +150,21 @@ impl LogBuilder {
     }
 
      fn output_log(&mut self) {
+
+        if self.is_dir {
+            self.dir_count += 1;
+        } else {
+            self.file_count += 1;
+            self.total_size += self.curr_size;
+        }
+
+
         match self.kind {
             Kind::Verbose => print!("{}", self.cache_log),
             Kind::Log => info!("{}", self.cache_log)
         }
         self.cache_log.clear();
+        self.curr_size = 0;
     }
 
      fn log_statistics(&mut self) {
@@ -174,17 +191,16 @@ impl LogBuilder {
     }
 
     fn update_stat(&mut self, file: &Path) -> Result<u64> {
-        let output = if file.is_dir() {
-            self.dir_count += 1;
-            0
+        if file.is_dir() {
+            self.curr_size = 0;
+            self.is_dir = true;
         } else {
-            self.file_count += 1;
             let meta = file.metadata()?;
             let size = meta.len();
-            self.total_size += size;
-            size
-        };
-        Ok(output)
+            self.curr_size += size;
+            self.is_dir = false;
+        }
+        Ok(self.curr_size)
     }
 
     fn init_logger() -> bool {
@@ -275,8 +291,14 @@ mod test {
             format!("Remove File: {:?} - freed 5.00 kb\n", file_path)
         );
 
+        assert_eq!(log.curr_size, 5000);
+        assert_eq!(log.total_size, 0);
+
         log.output_log();
         assert_eq!(log.cache_log, "");
+
+        assert_eq!(log.total_size, 5000);
+        assert_eq!(log.curr_size, 0);
 
         log.log_file_remove(&dir_path).unwrap();
         assert_eq!(log.cache_log, format!("Remove Directory: {:?}\n", dir_path));
