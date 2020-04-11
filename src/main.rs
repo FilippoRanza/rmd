@@ -7,7 +7,7 @@ use rmd::logger;
 pub fn parse_args<'a>() -> ArgMatches<'a> {
     let parser = App::new("rmd")
         .about("rm able to remove duplicate files")
-        .version("0.4.1")
+        .version("0.4.2")
         .author("Filippo Ranza");
 
     let parser = parser.arg(
