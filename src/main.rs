@@ -135,13 +135,12 @@ fn build_command<'a>(args: &'a ArgMatches<'a>) -> Option<engine::Command<'a>> {
 }
 
 fn build_logger<'a>(args: &'a ArgMatches<'a>) -> Option<logger::StatusLogger> {
-
     let mut status_logger = logger::StatusLogger::new();
     if args.is_present("verbose") {
         let level = logger::get_levle_from_int(args.occurrences_of("verbose"));
         status_logger.add_verbose(level);
     }
-    
+
     if args.is_present("log") {
         let level = logger::get_levle_from_int(args.occurrences_of("log"));
         status_logger.add_logger(level);

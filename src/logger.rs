@@ -21,19 +21,19 @@ pub fn get_levle_from_int(level: u64) -> VerboseLevel {
 
 enum Kind {
     Verbose,
-    Log
+    Log,
 }
 
 pub struct StatusLogger {
     verbose: Option<LogBuilder>,
-    logger : Option<LogBuilder>
+    logger: Option<LogBuilder>,
 }
 
 impl StatusLogger {
     pub fn new() -> Self {
         StatusLogger {
             verbose: None,
-            logger: None
+            logger: None,
         }
     }
 
@@ -55,7 +55,7 @@ impl StatusLogger {
         } else {
             false
         }
-    } 
+    }
 
     pub fn log_file_remove<P: AsRef<Path>>(&mut self, file: P) -> Result<()> {
         if let Some(ref mut verb) = self.verbose {
@@ -85,13 +85,10 @@ impl StatusLogger {
             log.log_statistics();
             log.output_log();
         }
-
     }
-
 }
 
-
- struct LogBuilder {
+struct LogBuilder {
     total_size: u64,
     file_count: usize,
     dir_count: usize,
@@ -103,8 +100,7 @@ impl StatusLogger {
 }
 
 impl LogBuilder {
-     fn new(level: VerboseLevel, kind: Kind) -> Self {
-
+    fn new(level: VerboseLevel, kind: Kind) -> Self {
         if let Kind::Log = kind {
             LogBuilder::init_logger();
         }
@@ -123,7 +119,7 @@ impl LogBuilder {
         }
     }
 
-     fn log_file_remove<P: AsRef<Path>>(&mut self, file: P) -> Result<()> {
+    fn log_file_remove<P: AsRef<Path>>(&mut self, file: P) -> Result<()> {
         self.inner_log_file_remove(file.as_ref())
     }
 
@@ -149,8 +145,7 @@ impl LogBuilder {
         Ok(())
     }
 
-     fn output_log(&mut self) {
-
+    fn output_log(&mut self) {
         if self.is_dir {
             self.dir_count += 1;
         } else {
@@ -158,16 +153,15 @@ impl LogBuilder {
             self.total_size += self.curr_size;
         }
 
-
         match self.kind {
             Kind::Verbose => print!("{}", self.cache_log),
-            Kind::Log => info!("{}", self.cache_log)
+            Kind::Log => info!("{}", self.cache_log),
         }
         self.cache_log.clear();
         self.curr_size = 0;
     }
 
-     fn log_statistics(&mut self) {
+    fn log_statistics(&mut self) {
         if let VerboseLevel::High = self.level {
             writeln!(&mut self.cache_log, "Final job statistics:")
                 .expect("unable to format log message");
