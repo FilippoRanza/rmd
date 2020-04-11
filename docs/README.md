@@ -33,6 +33,8 @@ It works in an almost compatible way with the standard rm. To get a full help ru
 rmd --help
 ```
 
+### Standard Features (Standard Mode)
+
 But the most common scenarios includes:
 
 - remove files, for example:
@@ -44,7 +46,19 @@ rmd FILE_A FILE_B
 ```bash
 rmd -rf DIR_A
 ```
-### Additional Features
+
+- enable verbose mode, **rmd** shows the name of removed files:
+```bash
+rmd -v FILE_A
+```
+
+or a more verbose, **rmd** shows also statistics about removed files:
+```bash
+rmd -vv FILE_A
+```
+
+
+### Additional Features (Automatic Mode)
 #### Remove Duplicates
 - remove duplicates files in the current directory, and all sub directoris:
 ```bash
@@ -218,4 +232,7 @@ properly quote the specification string so it will be treated as a unique argume
 (i.e. **rm** run with *newer*, *older*, *duplicates*, *smaller*, *larger*).
 This operation is done from the bottom of the directory tree, so directories that contains only directoies (recursively) without any file are considered empty.
 So, although not technically empty
-those directoies will be removed. Pay attention ;-). 
+those directoies will be removed. Pay attention ;-). Clean flag does not 
+take any effect where uses in standard mode.
+
+- Verbose flag can be set in standard or in automatic mode.
