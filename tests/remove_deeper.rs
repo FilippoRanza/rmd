@@ -15,16 +15,24 @@ fn remove_deeper_duplicates() {
     let temp_dir = TempDir::new().expect("cannot create a temp dir");
     let file_to_keep = fill_directory(temp_dir.path());
     let sub_dir = temp_dir.path().join("a").join("b");
-    fill_directory(&sub_dir);
-    Command::new("cargo")
+    let file_to_remove = fill_directory(&sub_dir);
+    let _ = Command::new("cargo")
         .arg("run")
         .arg("--")
-        .arg("-dcv")
-        .arg(temp_dir.path().as_os_str());
-    assert!(!sub_dir.exists());
+        .arg("-drcv")
+        .arg(temp_dir.path().as_os_str())
+        .output();    
+        
     for file in file_to_keep {
         assert!(file.exists());
     }
+
+    for file in file_to_remove {
+        assert!(!file.exists(), "{}", file.to_str().unwrap());
+    }
+
+    assert!(!sub_dir.exists());
+
 }
 
 fn fill_directory(path: &Path) -> Vec<PathBuf> {
