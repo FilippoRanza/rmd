@@ -25,6 +25,17 @@ This tool can be easly installed from sources:
 cargo install rmd
 ```
 
+### Compile from source
+It is also possible to directly clone di repository and compile **rmd** from there.
+In this case it is recommended to run all tests before compile **rmd** for production.
+A convenient way to do that is using make
+```bash
+make build
+```
+This will run all cargo tests (both unit and integration) and cli tests before compile rmd for 
+production.
+
+
 
 ## Usage 
 It works in an almost compatible way with the standard rm. To get a full help run:
