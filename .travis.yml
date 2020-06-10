@@ -3,6 +3,7 @@ script:
 - cargo build --verbose --all
 - cargo test --verbose --all --  --nocapture
 - bash cli_test.sh
+- make build
 deploy:
   provider: cargo
   on:
