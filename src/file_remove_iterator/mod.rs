@@ -1,3 +1,4 @@
+pub mod file_ignore;
 pub mod file_remove;
 mod parser;
 pub mod remove_by_date;

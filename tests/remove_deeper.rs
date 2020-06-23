@@ -21,8 +21,8 @@ fn remove_deeper_duplicates() {
         .arg("--")
         .arg("-drcv")
         .arg(temp_dir.path().as_os_str())
-        .output();    
-        
+        .output();
+
     for file in file_to_keep {
         assert!(file.exists());
     }
@@ -32,7 +32,6 @@ fn remove_deeper_duplicates() {
     }
 
     assert!(!sub_dir.exists());
-
 }
 
 fn fill_directory(path: &Path) -> Vec<PathBuf> {
