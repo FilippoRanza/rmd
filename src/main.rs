@@ -1,9 +1,9 @@
 extern crate clap;
 
-use std::collections::HashSet;
 use clap::{App, Arg, ArgGroup, ArgMatches};
 use rmd::engine;
 use rmd::logger;
+use std::collections::HashSet;
 
 pub fn parse_args<'a>() -> ArgMatches<'a> {
     let parser = App::new("rmd")
@@ -144,7 +144,6 @@ fn build_command<'a>(args: &'a ArgMatches<'a>) -> Option<engine::Command<'a>> {
     }
 }
 
-
 fn build_decorators<'a>(args: &'a ArgMatches<'a>) -> Option<Vec<engine::CommandDecorator>> {
     let mut decorators = Vec::new();
     if args.is_present("ignore-extensions") {
@@ -153,11 +152,10 @@ fn build_decorators<'a>(args: &'a ArgMatches<'a>) -> Option<Vec<engine::CommandD
         let cmd_decorator = engine::CommandDecorator::IgnoreExtension(extensions);
         decorators.push(cmd_decorator);
         Some(decorators)
-    } else {    
+    } else {
         None
     }
 }
-
 
 fn build_logger<'a>(args: &'a ArgMatches<'a>) -> Option<logger::StatusLogger> {
     let mut status_logger = logger::StatusLogger::new();

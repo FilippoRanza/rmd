@@ -13,7 +13,7 @@ pub enum Command<'a> {
 }
 
 pub enum CommandDecorator {
-    IgnoreExtension(HashSet<String>)
+    IgnoreExtension(HashSet<String>),
 }
 
 pub enum Mode {
@@ -28,7 +28,7 @@ pub fn automatic_remove(
     command: Command,
     clean: bool,
     log: &mut Option<logger::StatusLogger>,
-    decorators: Option<Vec<CommandDecorator>>
+    decorators: Option<Vec<CommandDecorator>>,
 ) -> Result<()> {
     let controller = make_controller(command)?;
     let mut controller = make_decorators(controller, decorators);
@@ -116,7 +116,10 @@ fn make_controller(command: Command) -> Result<Box<dyn file_remove::FileRemove>>
     }
 }
 
-fn make_decorators(file_remover: Box<dyn file_remove::FileRemove>, decorators: Option<Vec<CommandDecorator>>) -> Box<dyn file_remove::FileRemove> {
+fn make_decorators(
+    file_remover: Box<dyn file_remove::FileRemove>,
+    decorators: Option<Vec<CommandDecorator>>,
+) -> Box<dyn file_remove::FileRemove> {
     if let Some(decorators) = decorators {
         let mut file_remover = file_remover;
         for decorator in decorators.into_iter() {
@@ -126,13 +129,12 @@ fn make_decorators(file_remover: Box<dyn file_remove::FileRemove>, decorators: O
                     Box::new(ignore)
                 }
             };
-        }   
+        }
         file_remover
     } else {
         file_remover
     }
 }
-
 
 #[cfg(test)]
 mod test {
@@ -159,7 +161,7 @@ mod test {
             Command::Duplicates,
             false,
             &mut None,
-            None
+            None,
         )
         .unwrap();
 
@@ -254,7 +256,7 @@ mod test {
             Command::ByDate(("2s", true)),
             false,
             &mut None,
-            None
+            None,
         )
         .unwrap();
 
@@ -280,7 +282,7 @@ mod test {
             Command::ByDate(("2s", false)),
             false,
             &mut None,
-            None
+            None,
         )
         .unwrap();
 
@@ -301,7 +303,7 @@ mod test {
             Command::BySize((size_spec, false)),
             false,
             &mut None,
-            None
+            None,
         )
         .unwrap();
         for f in non_remove_files.iter() {
@@ -325,7 +327,7 @@ mod test {
             Command::BySize((size_spec, true)),
             false,
             &mut None,
-            None
+            None,
         )
         .unwrap();
         for f in non_remove_files.iter() {
@@ -404,7 +406,7 @@ mod test {
             Command::Duplicates,
             true,
             &mut None,
-            None
+            None,
         )
         .unwrap();
 

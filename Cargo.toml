@@ -1,6 +1,6 @@
 [package]
 name = "rmd"
-version = "0.4.4"
+version = "0.4.5"
 authors = ["Filippo Ranza <filipporanza@gmail.com>"]
 edition = "2018"
 license = "MIT"

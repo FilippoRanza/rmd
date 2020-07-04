@@ -1,3 +1,4 @@
+pub mod directory_check;
 pub mod file_ignore;
 pub mod file_remove;
 mod parser;
