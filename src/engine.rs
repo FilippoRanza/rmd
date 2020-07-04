@@ -87,14 +87,14 @@ fn run_remove(
 ) -> Result<()> {
     match mode {
         Mode::Standard => {
-            file_remove::file_remover(path, controller, clean, log)?;
+            file_remove::file_remover(path, controller, clean, log, None)?;
         }
         Mode::Force => {
-            let _ = file_remove::file_remover(path, controller, clean, log);
+            let _ = file_remove::file_remover(path, controller, clean, log, None);
         }
         Mode::Interactive => {
             if io_engine::remove_question(path)? {
-                file_remove::file_remover(path, controller, clean, log)?;
+                file_remove::file_remover(path, controller, clean, log, None)?;
             }
         }
     }
