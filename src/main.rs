@@ -1,5 +1,6 @@
 extern crate clap;
 
+use std::collections::HashSet;
 use clap::{App, Arg, ArgGroup, ArgMatches};
 use rmd::engine;
 use rmd::logger;
@@ -101,6 +102,15 @@ pub fn parse_args<'a>() -> ArgMatches<'a> {
 
     let parser = parser.arg(Arg::with_name("files").multiple(true).help("remove files"));
 
+    let parser = parser.arg(
+        Arg::with_name("ignore-extensions")
+            .long("--ignore-extensions")
+            .takes_value(true)
+            .multiple(true)
+            .help("specify extension to ignore: any file ending with one of these will never be removed by an automatic remover")
+            .requires("automatic removal")
+    );
+
     parser.get_matches()
 }
 
@@ -134,6 +144,21 @@ fn build_command<'a>(args: &'a ArgMatches<'a>) -> Option<engine::Command<'a>> {
     }
 }
 
+
+fn build_decorators<'a>(args: &'a ArgMatches<'a>) -> Option<Vec<engine::CommandDecorator>> {
+    let mut decorators = Vec::new();
+    if args.is_present("ignore-extensions") {
+        let values = args.values_of("ignore-extensions").unwrap();
+        let extensions: HashSet<String> = values.map(|s| s.to_owned()).collect();
+        let cmd_decorator = engine::CommandDecorator::IgnoreExtension(extensions);
+        decorators.push(cmd_decorator);
+        Some(decorators)
+    } else {    
+        None
+    }
+}
+
+
 fn build_logger<'a>(args: &'a ArgMatches<'a>) -> Option<logger::StatusLogger> {
     let mut status_logger = logger::StatusLogger::new();
     if args.is_present("verbose") {
@@ -164,8 +189,9 @@ fn run_remove<'a>(args: ArgMatches<'a>) -> std::io::Result<()> {
     let command = build_command(&args);
     let mut log = build_logger(&args);
     if let Some(command) = command {
+        let decorators = build_decorators(&args);
         let clean = args.is_present("clean");
-        engine::automatic_remove(&files, mode, command, clean, &mut log)?;
+        engine::automatic_remove(&files, mode, command, clean, &mut log, decorators)?;
     } else if arg_set {
         engine::remove(&files, mode, args.is_present("recursive"), &mut log)?;
     }
