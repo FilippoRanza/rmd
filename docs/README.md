@@ -266,6 +266,7 @@ will not be removed.
 
 - *--ignore-directories* allows to specify a list of directory names (just 
 the last component in the path string) that will be ignored by **rmd**
+
 ```bash
 rmd --clean --ignore-directories xmas_photos --older 1y documents
 ```
