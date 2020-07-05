@@ -85,7 +85,7 @@ fn make_sub_dir(
     file_size: usize,
 ) -> Vec<PathBuf> {
     let mut output = Vec::new();
-    let data: Vec<u8> = (0..file_size).map(|x| 0).collect();
+    let data: Vec<u8> = (0..file_size).map(|_| 0).collect();
     let dir_path = root.join(dir_name);
     if !dir_path.is_dir() {
         create_dir(&dir_path).unwrap();
@@ -105,7 +105,7 @@ fn make_sub_dir(
 fn create_empty_dirs(root: &Path, names: &[&str]) {
     for name in names {
         let path = root.join(name);
-        create_dir(path);
+        create_dir(path).unwrap();
     }
 }
 
