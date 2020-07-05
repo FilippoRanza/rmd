@@ -1,5 +1,5 @@
+use super::file_filter;
 use crate::logger;
-use super::directory_check;
 use std::io::Error;
 use std::path::Path;
 
@@ -23,22 +23,18 @@ pub fn file_remover(
     remove: &mut Box<dyn FileRemove>,
     clean: bool,
     log: &mut Option<logger::StatusLogger>,
-    dir_check: Option<directory_check::DirectoryCheck>
+    file_filter: &file_filter::FileFilter,
 ) -> Result<bool, Error> {
     let mut empty = true;
     let mut directory_queue = Vec::new();
     for entry in read_dir(path)? {
         let entry = entry?;
+        if !file_filter.process_path(&entry.path()) {
+            continue;
+        }
         if entry.path().is_dir() {
             let dir_path = entry.path();
-            let process = if let Some(ref dir_check) = dir_check {
-                dir_check.process_directory(&dir_path)
-            } else {
-                true
-            };
-            if process {
-                directory_queue.push(dir_path);
-            }
+            directory_queue.push(dir_path);
         } else if remove.remove(&entry.path())? {
             logger::add_file_remove_log(log, &entry.path())?;
             remove_file(entry.path())?;
@@ -49,7 +45,7 @@ pub fn file_remover(
     }
 
     for sub_dir in directory_queue {
-        let rm_dir = file_remover(sub_dir.to_str().unwrap(), remove, clean, log, None)?;
+        let rm_dir = file_remover(sub_dir.to_str().unwrap(), remove, clean, log, file_filter)?;
         if rm_dir {
             if clean {
                 logger::add_file_remove_log(log, &sub_dir)?;

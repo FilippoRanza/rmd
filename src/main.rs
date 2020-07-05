@@ -3,7 +3,6 @@ extern crate clap;
 use clap::{App, Arg, ArgGroup, ArgMatches};
 use rmd::engine;
 use rmd::logger;
-use std::collections::HashSet;
 
 pub fn parse_args<'a>() -> ArgMatches<'a> {
     let parser = App::new("rmd")
@@ -111,6 +110,15 @@ pub fn parse_args<'a>() -> ArgMatches<'a> {
             .requires("automatic removal")
     );
 
+    let parser = parser.arg(
+        Arg::with_name("ignore-directories")
+        .long("--ignore-directories")
+        .takes_value(true)
+        .multiple(true)
+        .help("specify directories to ignore: these directoies will not be checked by an automatic remover")
+        .requires("automatic removal")
+    );
+
     parser.get_matches()
 }
 
@@ -144,19 +152,6 @@ fn build_command<'a>(args: &'a ArgMatches<'a>) -> Option<engine::Command<'a>> {
     }
 }
 
-fn build_decorators<'a>(args: &'a ArgMatches<'a>) -> Option<Vec<engine::CommandDecorator>> {
-    let mut decorators = Vec::new();
-    if args.is_present("ignore-extensions") {
-        let values = args.values_of("ignore-extensions").unwrap();
-        let extensions: HashSet<String> = values.map(|s| s.to_owned()).collect();
-        let cmd_decorator = engine::CommandDecorator::IgnoreExtension(extensions);
-        decorators.push(cmd_decorator);
-        Some(decorators)
-    } else {
-        None
-    }
-}
-
 fn build_logger<'a>(args: &'a ArgMatches<'a>) -> Option<logger::StatusLogger> {
     let mut status_logger = logger::StatusLogger::new();
     if args.is_present("verbose") {
@@ -176,6 +171,15 @@ fn build_logger<'a>(args: &'a ArgMatches<'a>) -> Option<logger::StatusLogger> {
     }
 }
 
+fn get_multiple_args<'a>(args: &'a ArgMatches<'a>, name: &str) -> Option<Vec<&'a str>> {
+    if args.is_present(name) {
+        let tmp: Vec<&str> = args.values_of(name).unwrap().collect();
+        Some(tmp)
+    } else {
+        None
+    }
+}
+
 fn run_remove<'a>(args: ArgMatches<'a>) -> std::io::Result<()> {
     let mode = get_mode(args.is_present("force"), args.is_present("interactive"));
 
@@ -187,9 +191,16 @@ fn run_remove<'a>(args: ArgMatches<'a>) -> std::io::Result<()> {
     let command = build_command(&args);
     let mut log = build_logger(&args);
     if let Some(command) = command {
-        let decorators = build_decorators(&args);
         let clean = args.is_present("clean");
-        engine::automatic_remove(&files, mode, command, clean, &mut log, decorators)?;
+        engine::automatic_remove(
+            &files,
+            mode,
+            command,
+            clean,
+            &mut log,
+            get_multiple_args(&args, "ignore-extensions"),
+            get_multiple_args(&args, "ignore-directories"),
+        )?;
     } else if arg_set {
         engine::remove(&files, mode, args.is_present("recursive"), &mut log)?;
     }
