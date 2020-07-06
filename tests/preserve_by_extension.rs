@@ -108,9 +108,6 @@ fn preserve_by_extension_in_sub_directories() {
     }
 }
 
-
-
-
 fn make_sub_dirs(root: &Path, count: i32, depth: i32) -> Vec<PathBuf> {
     let mut output = Vec::new();
     for i in 0..count {
@@ -160,9 +157,7 @@ fn test_skip_backup_files() {
     for file in &files {
         assert!(file.exists());
     }
-
 }
-
 
 fn make_duplicates(root: &Path, names: &[&str]) -> Vec<PathBuf> {
     let mut output = Vec::new();
@@ -184,4 +179,3 @@ fn make_file(root: &Path, name: String) -> PathBuf {
     file.write(name.as_bytes()).unwrap();
     file_path
 }
-

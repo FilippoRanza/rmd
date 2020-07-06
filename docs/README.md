@@ -281,6 +281,7 @@ rmd --clean --ignore-directories important_files .git --duplicates /home/user
 will remove any duplicate file in the user home, and recursivelly in all sub
 directories, ignoring any directory named *.git* or *important_files*. 
 
+It is allowed to use *--ignore-directories* and *--ignore-extensions* together. 
 
 ### Note
 - When working in *interactive* mode and a  remove file is a
