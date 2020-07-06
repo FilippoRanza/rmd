@@ -108,6 +108,9 @@ fn preserve_by_extension_in_sub_directories() {
     }
 }
 
+
+
+
 fn make_sub_dirs(root: &Path, count: i32, depth: i32) -> Vec<PathBuf> {
     let mut output = Vec::new();
     for i in 0..count {
@@ -136,3 +139,49 @@ fn make_files(root: &Path, names: &[&str], extensions: &[&str], size: usize) -> 
     }
     output
 }
+
+#[test]
+fn test_skip_backup_files() {
+    let root = TempDir::new().unwrap();
+    let names = ["test", "file", "important", "stuff", "data"];
+    let files = make_duplicates(root.path(), &names);
+
+    let output = Command::new("cargo")
+        .arg("run")
+        .arg("--")
+        .arg("--ignore-extensions")
+        .arg("bak")
+        .arg("--duplicates")
+        .arg(root.path().as_os_str())
+        .output();
+
+    println!("{:?}", output);
+
+    for file in &files {
+        assert!(file.exists());
+    }
+
+}
+
+
+fn make_duplicates(root: &Path, names: &[&str]) -> Vec<PathBuf> {
+    let mut output = Vec::new();
+
+    for name in names {
+        let tmp = make_file(root, format!("{}.txt", name));
+        output.push(tmp);
+
+        let tmp = make_file(root, format!("{}.txt.bak", name));
+        output.push(tmp);
+    }
+
+    output
+}
+
+fn make_file(root: &Path, name: String) -> PathBuf {
+    let file_path = root.join(&name);
+    let mut file = File::create(&file_path).unwrap();
+    file.write(name.as_bytes()).unwrap();
+    file_path
+}
+
