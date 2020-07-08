@@ -311,3 +311,18 @@ output is sent. *log* send its output to *syslog*, *verbose* to stdout.
 
 - *--ignore-extensions* and *--ignore-directories* can be used only with an
 automatic remover
+
+
+### Advices
+
+It is very likely that you will end up using ```--ignore-extenions``` and/or ```--ignore-directories``` with the same arguments over and over. In this scenario a good idea could be add an alias to your shell configuration file like
+```bash
+alias rmdd='rmd --ignore-extensions bak --ignore-directories .git .hg'
+```
+
+or a shell function like
+```bash
+function rmd() {
+    rmd --ignore-extensions bak --ignore-directories .git .hg -- "$@"
+}
+```
