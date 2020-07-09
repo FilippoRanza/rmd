@@ -27,7 +27,7 @@ impl FileFilter {
 
     pub fn process_path(&self, path: &Path) -> bool {
         if self.ignore_hiddens && is_hidden(path) {
-            true
+            false
         } else if path.is_file() {
             check_path(&self.ignore_exts, path.extension())
         } else {
@@ -85,6 +85,39 @@ mod tests {
 
     use super::*;
     use tempfile::TempDir;
+
+
+    #[test]
+    fn test_preserve_hiddens() {
+        let root = TempDir::new().unwrap();
+
+        let preserve_names = [".hidden_a", ".hidden_b"];
+
+        let remove_names = ["file_a", "file_b", "stuff_a", "stuff_b"];
+        let preserve_extensions = ["txt", "jpeg"];
+        let remove_extensions = ["rs", "png"];
+        let std_dir_path = ["path", "to", "stuff"];
+    
+        let mut preserve_files = create_files(root.path(), &std_dir_path, &preserve_names, &remove_extensions);
+        let mut tmp = create_files(root.path(), &std_dir_path, &remove_names, &preserve_extensions);
+        preserve_files.append(&mut tmp);
+
+        let remove_files = create_files(root.path(), &std_dir_path, &remove_names, &remove_extensions);
+
+
+
+        let filter = FileFilter::new(Some(&preserve_extensions), None);
+        let filter = filter.ingnore_hidden();
+
+        for file in &preserve_files {
+            assert!(!filter.process_path(file), "{:?}", file);
+        }
+
+        for file in &remove_files {
+            assert!(filter.process_path(file), "{:?}", file);
+        }
+
+    }
 
     #[test]
     fn test_preserve_files() {
