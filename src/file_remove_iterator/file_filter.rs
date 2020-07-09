@@ -5,6 +5,7 @@ use std::path::Path;
 pub struct FileFilter {
     ignore_dirs: Option<HashSet<String>>,
     ignore_exts: Option<HashSet<String>>,
+    ignore_hiddens: bool,
 }
 
 impl FileFilter {
@@ -15,11 +16,19 @@ impl FileFilter {
         Self {
             ignore_dirs,
             ignore_exts,
+            ignore_hiddens: false,
         }
     }
 
+    pub fn ingnore_hidden(mut self) -> Self {
+        self.ignore_hiddens = true;
+        self
+    }
+
     pub fn process_path(&self, path: &Path) -> bool {
-        if path.is_file() {
+        if self.ignore_hiddens && is_hidden(path) {
+            true
+        } else if path.is_file() {
             check_path(&self.ignore_exts, path.extension())
         } else {
             check_path(&self.ignore_dirs, path.file_name())
@@ -53,6 +62,18 @@ fn collect_string_slice(slice: Option<&[&str]>) -> Option<HashSet<String>> {
         Some(tmp)
     } else {
         None
+    }
+}
+
+fn is_hidden(path: &Path) -> bool {
+    if let Some(name) = path.file_name() {
+        if let Some(name) = name.to_str() {
+            name.starts_with(".")
+        } else {
+            false
+        }
+    } else {
+        false
     }
 }
 

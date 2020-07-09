@@ -25,9 +25,10 @@ pub fn automatic_remove(
     log: &mut Option<logger::StatusLogger>,
     extensions: Option<Vec<&str>>,
     directories: Option<Vec<&str>>,
+    ignore_hiddens: bool,
 ) -> Result<()> {
     let mut controller = make_controller(command)?;
-    let filter = make_file_filter(extensions, directories);
+    let filter = make_file_filter(extensions, directories, ignore_hiddens);
     for path in paths.iter() {
         run_remove(path, &mode, &mut controller, clean, log, &filter)?;
     }
@@ -99,7 +100,11 @@ fn run_remove(
     Ok(())
 }
 
-fn make_file_filter(ext: Option<Vec<&str>>, dir: Option<Vec<&str>>) -> file_filter::FileFilter {
+fn make_file_filter(
+    ext: Option<Vec<&str>>,
+    dir: Option<Vec<&str>>,
+    ignore_hidden: bool,
+) -> file_filter::FileFilter {
     let ext: Option<&[&str]> = if let Some(ref ext) = ext {
         Some(&ext)
     } else {
@@ -112,7 +117,12 @@ fn make_file_filter(ext: Option<Vec<&str>>, dir: Option<Vec<&str>>) -> file_filt
         None
     };
 
-    file_filter::FileFilter::new(ext, dir)
+    let output = file_filter::FileFilter::new(ext, dir);
+    if ignore_hidden {
+        output.ingnore_hidden()
+    } else {
+        output
+    }
 }
 
 fn make_controller(command: Command) -> Result<Box<dyn file_remove::FileRemove>> {
@@ -156,6 +166,7 @@ mod test {
             &mut None,
             None,
             None,
+            false,
         )
         .unwrap();
 
@@ -252,6 +263,7 @@ mod test {
             &mut None,
             None,
             None,
+            false,
         )
         .unwrap();
 
@@ -279,6 +291,7 @@ mod test {
             &mut None,
             None,
             None,
+            false,
         )
         .unwrap();
 
@@ -301,6 +314,7 @@ mod test {
             &mut None,
             None,
             None,
+            false,
         )
         .unwrap();
         for f in non_remove_files.iter() {
@@ -326,6 +340,7 @@ mod test {
             &mut None,
             None,
             None,
+            false,
         )
         .unwrap();
         for f in non_remove_files.iter() {
@@ -406,6 +421,7 @@ mod test {
             &mut None,
             None,
             None,
+            false,
         )
         .unwrap();
 

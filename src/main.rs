@@ -119,6 +119,12 @@ pub fn parse_args<'a>() -> ArgMatches<'a> {
         .requires("automatic removal")
     );
 
+    let parser = parser.arg(
+        Arg::with_name("hiddens")
+        .long("--ignore-hiddens")
+        .help("ignore any hidden file or directory, WORKS ONLY WITH UNIX HIDDEN: FILE NAME MUST START WITH '.'")
+    );
+
     parser.get_matches()
 }
 
@@ -200,6 +206,7 @@ fn run_remove<'a>(args: ArgMatches<'a>) -> std::io::Result<()> {
             &mut log,
             get_multiple_args(&args, "ignore-extensions"),
             get_multiple_args(&args, "ignore-directories"),
+            args.is_present("hidden"),
         )?;
     } else if arg_set {
         engine::remove(&files, mode, args.is_present("recursive"), &mut log)?;
