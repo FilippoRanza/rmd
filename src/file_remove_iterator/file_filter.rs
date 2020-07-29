@@ -86,7 +86,6 @@ mod tests {
     use super::*;
     use tempfile::TempDir;
 
-
     #[test]
     fn test_preserve_hiddens() {
         let root = TempDir::new().unwrap();
@@ -97,14 +96,27 @@ mod tests {
         let preserve_extensions = ["txt", "jpeg"];
         let remove_extensions = ["rs", "png"];
         let std_dir_path = ["path", "to", "stuff"];
-    
-        let mut preserve_files = create_files(root.path(), &std_dir_path, &preserve_names, &remove_extensions);
-        let mut tmp = create_files(root.path(), &std_dir_path, &remove_names, &preserve_extensions);
+
+        let mut preserve_files = create_files(
+            root.path(),
+            &std_dir_path,
+            &preserve_names,
+            &remove_extensions,
+        );
+        let mut tmp = create_files(
+            root.path(),
+            &std_dir_path,
+            &remove_names,
+            &preserve_extensions,
+        );
         preserve_files.append(&mut tmp);
 
-        let remove_files = create_files(root.path(), &std_dir_path, &remove_names, &remove_extensions);
-
-
+        let remove_files = create_files(
+            root.path(),
+            &std_dir_path,
+            &remove_names,
+            &remove_extensions,
+        );
 
         let filter = FileFilter::new(Some(&preserve_extensions), None);
         let filter = filter.ingnore_hidden();
@@ -116,7 +128,6 @@ mod tests {
         for file in &remove_files {
             assert!(filter.process_path(file), "{:?}", file);
         }
-
     }
 
     #[test]

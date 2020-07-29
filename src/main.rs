@@ -121,7 +121,7 @@ pub fn parse_args<'a>() -> ArgMatches<'a> {
 
     let parser = parser.arg(
         Arg::with_name("hiddens")
-        .long("--ignore-hiddens")
+        .long("--ignore-unix-hiddens")
         .help("ignore any hidden file or directory, WORKS ONLY WITH UNIX HIDDEN: FILE NAME MUST START WITH '.'")
     );
 
