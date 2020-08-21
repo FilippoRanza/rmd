@@ -5,10 +5,10 @@
 An improved rm implementation able to remove duplicate files
 
 ## Description 
-**rmd** is an **rm** reimplementation made in pure Rust. It
+```rmd``` is an ```rm``` reimplementation made in pure Rust. It
 is able to remove files and directories as usual.
 
-**rmd** is also able to:
+```rmd``` is also able to:
 
 - Recursively remove duplicate file. Duplicates are found 
 by comparing *SHA256* file hash.
@@ -26,8 +26,8 @@ cargo install rmd
 ```
 
 ### Compile from source
-It is also possible to directly clone di repository and compile **rmd** from there.
-In this case it is recommended to run all tests before compile **rmd** for production.
+It is also possible to directly clone di repository and compile ```rmd``` from there.
+In this case it is recommended to run all tests before compile ```rmd``` for production.
 A convenient way to do that is using make
 ```bash
 make build
@@ -67,8 +67,8 @@ For a more verbose:
 ```bash
 rmd -vv FILE_A
 ```
- **rmd** shows also statistics about removed files, specifing if the removed
- file is a directory or a regular file, in the latter case **rmd** also shows 
+ ```rmd``` shows also statistics about removed files, specifing if the removed
+ file is a directory or a regular file, in the latter case ```rmd``` also shows 
  the size of the removed file.
 
 
@@ -109,7 +109,7 @@ Remove File *newer* then *time-spec*
 rmd --newer <time-spec> [directory...]
 ```
 
-**rmd** checks if the last access is **before** (so the file is **older**) or **after** 
+```rmd``` checks if the last access is **before** (so the file is **older**) or **after** 
 (so the file is **newer**) then the time described by the *time-specification*.
 *time-specification* describes a relative amount of time (in **seconds**) in the past 
 from the moment when the program is run. 
@@ -180,10 +180,10 @@ Remove File *larger* then *size-spec*
 rmd --larger <size-spec> [directory...]
 ```
 
-**rmd** checks if the file size, in bytes. If **larger** mode is used **rmd** checks,
+```rmd``` checks if the file size, in bytes. If **larger** mode is used ```rmd``` checks,
 for each file in the specified directory, and recursivelly in all sub directories,
-if the size is **larger or equal** to the size decribed in *size-spec* and if so **rmd**
-remove the file. Of course if **smaller** mode is used **rmd** checks for file **smaller or equal** to the size in *size-spec*. 
+if the size is **larger or equal** to the size decribed in *size-spec* and if so ```rmd```
+remove the file. Of course if **smaller** mode is used ```rmd``` checks for file **smaller or equal** to the size in *size-spec*. 
 
 *size-specification* format
 ```
@@ -247,8 +247,8 @@ with a size smaller or equal to *30 Kilobytes*.
 #### Skip Files
 Sometimes you may need to skip some files or directories 
 from been removed, for example you may want to preserve 
-any *.bak* file or to completely ignore directories like *.git*. In these cases **rmd** provides two usefull options:
-- *--ignore-extensions* allows to specify a list of extensions that will be ignored by **rmd** 
+any *.bak* file or to completely ignore directories like *.git*. In these cases ```rmd``` provides two usefull options:
+- ```--ignore-extensions``` allows to specify a list of extensions that will be ignored by ```rmd``` 
 
 ```bash
 rmd --ignore-extensions bak --duplicates
@@ -264,14 +264,14 @@ will remove all file larger or equal to *40 Kilobytes* in the *project* director
 will not be removed.
 
 
-- *--ignore-directories* allows to specify a list of directory names (just 
-the last component in the path string) that will be ignored by **rmd**
+- ```--ignore-directories``` allows to specify a list of directory names (just 
+the last component in the path string) that will be ignored by ```rmd```
 
 ```bash
 rmd --clean --ignore-directories xmas_photos --older 1y documents
 ```
 will remove any file older than one year in *documents* directory 
-and recursivelly in all sub directories, ignoring any directory named *xmas_photo*. If *xmas_photo* is empty it will not be removed. **rmd**
+and recursivelly in all sub directories, ignoring any directory named *xmas_photo*. If *xmas_photo* is empty it will not be removed. ```rmd```
 simply will never open any directory named *xmas_photo* in the directory tree 
 rooted in *documents*.
 
@@ -281,7 +281,7 @@ rmd --clean --ignore-directories important_files .git --duplicates /home/user
 will remove any duplicate file in the user home, and recursivelly in all sub
 directories, ignoring any directory named *.git* or *important_files*. 
 
-It is allowed to use *--ignore-directories* and *--ignore-extensions* together. 
+It is allowed to use ```--ignore-directories``` and ```--ignore-extensions``` together. 
 
 It is also possible to simply ignore hidden files and directories. 
 ```--ignore-unix-hidden``` allows to automatically ignore any file and directory whose name starts with '.' (unix style hidden files). ```rmd``` working with ```--ignore-unix-hidden``` set skips hidden files and does not open hidden directories, 
@@ -297,7 +297,7 @@ ignored.
 
 ### Note
 - When working in *interactive* mode and a  remove file is a
-directory **rmd** prompts only once for the root directory
+directory ```rmd``` prompts only once for the root directory
 - *newer*, *older*, *duplicates*, *smaller*, *larger* are mutually exclusive.
 - Specification String, in both time and size remove, can contain any number of
 non alphanumeric characters between a number and a descriptor or between a descriptor and
@@ -305,8 +305,8 @@ a number, those characters are simply treated as separators.
 The important thing are to **NOT** put sperators into numbers or into descriptors and to 
 properly quote the specification string so it will be treated as a unique argument.
 
-- *-c*/*--clean* flag deletes directories left empty after an automatic file removal,
-(i.e. **rmd** run with *newer*, *older*, *duplicates*, *smaller*, *larger*).
+- ```-c```/```--clean``` flag deletes directories left empty after an automatic file removal,
+(i.e. ```rmd``` run with *newer*, *older*, *duplicates*, *smaller*, *larger*).
 This operation is done from the bottom of the directory tree, so directories that contains only directoies (recursively) without any file are considered empty.
 So, although not technically empty
 those directoies will be removed. Pay attention ;-). Clean flag does not 
@@ -321,7 +321,7 @@ take any effect where uses in standard mode.
 - Output generated by *log* and *verbose* is the same, it just changes where this 
 output is sent. *log* send its output to *syslog*, *verbose* to stdout.
 
-- *--ignore-extensions*, *--ignore-directories* and ```--ignore-unix-hidden```
+- ```--ignore-extensions```, ```--ignore-directories``` and ```--ignore-unix-hidden```
 can be used only with an automatic remover
 
 - If ```--ignore-unix-hidden``` and ```--clean``` are used together empty hidden 
