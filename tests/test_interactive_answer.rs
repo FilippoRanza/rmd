@@ -27,7 +27,7 @@ fn test_all_negative_answer() {
         4 => "N\n",
         5 => "NO\n",
         6 => "YESS\n",
-        7 => "yres\n",
+        7 => "\n",
         8 => "qwe\n",
         9 => "333\n",
         _ => unreachable!(),

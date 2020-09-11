@@ -11,7 +11,7 @@ pub fn remove_question(name: &str) -> Result<bool> {
     let lower = buffer.to_lowercase();
     let ans = lower.trim();
 
-    if "yes".starts_with(ans) {
+    if ans.len() > 0 && "yes".starts_with(ans) {
         Ok(true)
     } else {
         Ok(false)
