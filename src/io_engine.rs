@@ -11,13 +11,11 @@ pub fn remove_question(name: &str) -> Result<bool> {
     let lower = buffer.to_lowercase();
     let ans = lower.trim();
 
-    let out = match ans {
-        "yes" => true,
-        "y" => true,
-        _ => false,
-    };
-
-    Ok(out)
+    if "yes".starts_with(ans) {
+        Ok(true)
+    } else {
+        Ok(false)
+    }
 }
 
 pub struct InteractiveFileRemove {
