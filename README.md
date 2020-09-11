@@ -15,13 +15,13 @@ is able to:
 
 ## Installation
 
-This tool can be easly installed from sources:
+This tool can be easily installed from sources:
 ```bash
 cargo install rmd
 ```
 
 ### Compile from source
-It is also possible to directly clone di repository and compile **rmd** from there.
+It is also possible to directly clone the repository and compile **rmd** from there.
 In this case it is recommended to run all tests before compile **rmd** for production.
 A convenient way to do that is using make
 ```bash

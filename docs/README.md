@@ -26,7 +26,7 @@ cargo install rmd
 ```
 
 ### Compile from source
-It is also possible to directly clone di repository and compile ```rmd``` from there.
+It is also possible to directly clone the repository and compile ```rmd``` from there.
 In this case it is recommended to run all tests before compile ```rmd``` for production.
 A convenient way to do that is using make
 ```bash
@@ -86,7 +86,7 @@ output the same information as *-vv* to syslog.
 
 ### Additional Features (Automatic Mode)
 #### Remove Duplicates
-- remove duplicates files in the current directory, and all sub directoris:
+- remove duplicates files in the current directory, and all sub directories:
 ```bash
 rmd -d
 ```
@@ -139,14 +139,14 @@ Time Descriptor Table
 ```bash
 rmd --older 2y4M5d
 ```
-will remove in the current directory, and recursivelly in all sub directories, file 
+will remove in the current directory, and recursively in all sub directories, file 
 with a last access time equal or before *2 year, 4 month and 5 days* in the past from
 the time when the program is run. 
 
 ```bash 
 rmd --newer '4h+30m'
 ```
-will remove in the current directory, and recursivelly in all sub directories, file 
+will remove in the current directory, and recursively in all sub directories, file 
 with a last access time equal or after *4 hour and 30 minutes* in the past from
 the time when the program is run. 
 
@@ -154,14 +154,14 @@ the time when the program is run.
 ```bash 
 rmd --older '1M 15d' /home/user/temp-store
 ```
-will remove in **/home/user/temp-store** and recursivelly in all sub directories, file 
-with a last access time equal or before *1 mounth and 15 days* in the past from
+will remove in **/home/user/temp-store** and recursively in all sub directories, file 
+with a last access time equal or before *1 month and 15 days* in the past from
 the time when the program is run. 
 
 ```bash 
 rmd --newer 30s /home/user/wrong-downloads
 ```
-will remove in **/home/user/wrong-downloads** and recursivelly in all sub directories, file 
+will remove in **/home/user/wrong-downloads** and recursively in all sub directories, file 
 with a last access time equal or after *30 seconds* in the past from
 the time when the program is run. 
 
@@ -223,43 +223,43 @@ Decimal and Binary size descriptor **can** be use together
 ```bash
 rmd --smaller '2kb,56mib'
 ```
-will remove in the current directory, and recursivelly in all sub directories, file 
+will remove in the current directory, and recursively in all sub directories, file 
 with a size smaller or equal to *56 Mebibytes and 2 Kilobytes*.
 ```bash 
 rmd --larger 4gb30mb
 ```
-will remove in the current directory, and recursivelly in all sub directories, file 
-with a size larger or equal to  *4 Gibabytes and 30 Megabytes*.
+will remove in the current directory, and recursively in all sub directories, file 
+with a size larger or equal to  *4 Gigabytes and 30 Megabytes*.
 
 
 ```bash 
 rmd --larger '1 mebi 15 kibi' /home/user/temp-store
 ```
-will remove in **/home/user/temp-store** and recursivelly in all sub directories, file 
+will remove in **/home/user/temp-store** and recursively in all sub directories, file 
 with a size larger or equal to *1 Mebibytes and 15 Kibibytes*. 
 
 ```bash 
 rmd --smaller 30kb /home/user/useless-files
 ```
-will remove in **/home/user/useless-files** and recursivelly in all sub directories, file 
+will remove in **/home/user/useless-files** and recursively in all sub directories, file 
 with a size smaller or equal to *30 Kilobytes*.
 
 #### Skip Files
 Sometimes you may need to skip some files or directories 
 from been removed, for example you may want to preserve 
-any *.bak* file or to completely ignore directories like *.git*. In these cases ```rmd``` provides two usefull options:
+any *.bak* file or to completely ignore directories like *.git*. In these cases ```rmd``` provides two useful options:
 - ```--ignore-extensions``` allows to specify a list of extensions that will be ignored by ```rmd``` 
 
 ```bash
 rmd --ignore-extensions bak --duplicates
 ```
-will remove any duplicate file in the current directory and recursivelly in all sub directories ignoring any file with *.bak* extension. So if to equal file "file.rs.bak" and "copy-file.rs.bak" will be preserved. Also the original
+will remove any duplicate file in the current directory and recursively in all sub directories ignoring any file with *.bak* extension. So if to equal file "file.rs.bak" and "copy-file.rs.bak" will be preserved. Also the original
 "file.bak" (if it is unique) will be preserved because *.bak* file are completely ignored.
 
 ```bash
 rmd --ignore-extensions bak pdf mp3 --larger 40kb project
 ```
-will remove all file larger or equal to *40 Kilobytes* in the *project* directory, and recursivelly in all sub directories, but files with *.bak*,
+will remove all file larger or equal to *40 Kilobytes* in the *project* directory, and recursively in all sub directories, but files with *.bak*,
 *.pdf* and *.mp3* extensions. So, for example, *project/docs.pdf* a 4 Mb file
 will not be removed.
 
@@ -271,14 +271,14 @@ the last component in the path string) that will be ignored by ```rmd```
 rmd --clean --ignore-directories xmas_photos --older 1y documents
 ```
 will remove any file older than one year in *documents* directory 
-and recursivelly in all sub directories, ignoring any directory named *xmas_photo*. If *xmas_photo* is empty it will not be removed. ```rmd```
+and recursively in all sub directories, ignoring any directory named *xmas_photo*. If *xmas_photo* is empty it will not be removed. ```rmd```
 simply will never open any directory named *xmas_photo* in the directory tree 
 rooted in *documents*.
 
 ```bash
 rmd --clean --ignore-directories important_files .git --duplicates /home/user
 ```
-will remove any duplicate file in the user home, and recursivelly in all sub
+will remove any duplicate file in the user home, and recursively in all sub
 directories, ignoring any directory named *.git* or *important_files*. 
 
 It is allowed to use ```--ignore-directories``` and ```--ignore-extensions``` together. 
@@ -297,12 +297,13 @@ ignored.
 
 ### Note
 - When working in *interactive* mode and a  remove file is a
-directory ```rmd``` prompts only once for the root directory
+directory ```rmd``` during an automatic removal prompts for each 
+file that need to be deleted, during a standard removal prompts just once
 - *newer*, *older*, *duplicates*, *smaller*, *larger* are mutually exclusive.
 - Specification String, in both time and size remove, can contain any number of
 non alphanumeric characters between a number and a descriptor or between a descriptor and
 a number, those characters are simply treated as separators.
-The important thing are to **NOT** put sperators into numbers or into descriptors and to 
+The important thing are to **NOT** put separators into numbers or into descriptors and to 
 properly quote the specification string so it will be treated as a unique argument.
 
 - ```-c```/```--clean``` flag deletes directories left empty after an automatic file removal,
@@ -329,7 +330,7 @@ directories are safe from removal as non empty hidden directories.
 
 
 
-### Advices
+### Advice
 
 It is very likely that you will end up using ```--ignore-extenions``` and/or ```--ignore-directories``` with the same arguments over and over. In this scenario a good idea could be add an alias to your shell configuration file like
 ```bash
