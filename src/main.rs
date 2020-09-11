@@ -7,7 +7,7 @@ use rmd::logger;
 pub fn parse_args<'a>() -> ArgMatches<'a> {
     let parser = App::new("rmd")
         .about("rm able to remove duplicate files")
-        .version("0.5.1")
+        .version("0.5.3")
         .author("Filippo Ranza");
 
     let parser = parser.arg(
@@ -29,7 +29,7 @@ pub fn parse_args<'a>() -> ArgMatches<'a> {
         Arg::with_name("interactive")
             .short("-i")
             .long("--inter")
-            .help("prompt before every removal")
+            .help("prompt before every removal, by default the answer is assumed `NO`")
             .conflicts_with("force"),
     );
 
