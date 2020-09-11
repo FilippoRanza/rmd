@@ -27,7 +27,13 @@ pub fn automatic_remove(
     directories: Option<Vec<&str>>,
     ignore_hiddens: bool,
 ) -> Result<()> {
-    let mut controller = make_controller(command)?;
+    let controller = make_controller(command)?;
+    let mut controller = if let Mode::Interactive = mode {
+        let controller = io_engine::InteractiveFileRemove::new(controller);
+        Box::new(controller)
+    } else {
+        controller
+    };
     let filter = make_file_filter(extensions, directories, ignore_hiddens);
     for path in paths.iter() {
         run_remove(path, &mode, &mut controller, clean, log, &filter)?;
@@ -84,16 +90,11 @@ fn run_remove(
     file_filter: &file_filter::FileFilter,
 ) -> Result<()> {
     match mode {
-        Mode::Standard => {
+        Mode::Standard | Mode::Interactive => {
             file_remove::file_remover(path, controller, clean, log, file_filter)?;
         }
         Mode::Force => {
             let _ = file_remove::file_remover(path, controller, clean, log, file_filter);
-        }
-        Mode::Interactive => {
-            if io_engine::remove_question(path)? {
-                file_remove::file_remover(path, controller, clean, log, file_filter)?;
-            }
         }
     }
 

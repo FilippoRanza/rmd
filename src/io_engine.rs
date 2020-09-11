@@ -1,4 +1,6 @@
+use crate::file_remove_iterator::file_remove::FileRemove;
 use std::io::*;
+use std::path::Path;
 
 pub fn remove_question(name: &str) -> Result<bool> {
     let mut buffer = String::new();
@@ -16,4 +18,30 @@ pub fn remove_question(name: &str) -> Result<bool> {
     };
 
     Ok(out)
+}
+
+pub struct InteractiveFileRemove {
+    file_remove: Box<dyn FileRemove>,
+}
+
+impl InteractiveFileRemove {
+    pub fn new(file_remove: Box<dyn FileRemove>) -> Self {
+        Self { file_remove }
+    }
+}
+
+impl FileRemove for InteractiveFileRemove {
+    fn remove(&mut self, path: &Path) -> Result<bool> {
+        if self.file_remove.remove(path)? {
+            let name = if let Some(name) = path.to_str() {
+                name
+            } else {
+                eprintln!("WARNING: CANNOT DISPLAY FILE NAME!");
+                ""
+            };
+            remove_question(name)
+        } else {
+            Ok(false)
+        }
+    }
 }
