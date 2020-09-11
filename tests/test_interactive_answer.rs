@@ -55,10 +55,17 @@ where
         .flatten()
         .collect();
 
-    run_remove_duplicates(temp_root.path(), &ans);
+    let output = run_remove_duplicates(temp_root.path(), &ans);
+    let stdout = String::from_utf8(output.stdout).unwrap();
+    assert!(output.status.success(), "{}\n{}", stdout, String::from_utf8(output.stderr).unwrap());
+    
 
     let count = files.iter().filter(|f| f.exists()).count();
     assert_eq!(count, expected_count);
+
+    let lines: Vec<&str> = stdout.lines().collect();
+    assert_eq!(lines.len(), file_count - 1);
+
 }
 
 fn run_remove_duplicates(dir: &Path, input: &[u8]) -> Output {
